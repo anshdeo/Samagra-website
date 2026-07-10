@@ -1183,17 +1183,6 @@
     box-shadow: 0 0 0 2px var(--sage);
   }
 
-  /* While this person's bio is open, their portrait empties to a dashed ring
-     — the photo reads as having moved into the dialog, not duplicated. */
-  .root__frame--away {
-    box-shadow: none;
-    border: 1.5px dashed rgba(248, 250, 248, 0.4);
-  }
-
-  .root__frame--away .avatar {
-    opacity: 0;
-  }
-
   .root__name {
     display: block;
     font-family: var(--font-display);
@@ -1324,44 +1313,83 @@
     }
   }
 
-  /* Bio dialogs */
+  /* Bio dialog — a two-tone profile card: a forest-green header (the same
+     dark earth as the team section, so the popup feels of a piece with it)
+     carrying the portrait and name, over a light body for the longer bio
+     and expertise text. The portrait is a fixed circular frame — no morph,
+     no shape change. */
   .bio-dialog {
-    /* Must stay fixed (not relative) — the native dialog:modal UA stylesheet
-       centers it via position:fixed + inset:0 + margin:auto, which is
-       relative to the viewport regardless of scroll position. Overriding it
-       to "relative" was forcing the browser to scroll the document to bring
-       the dialog into view whenever it opened mid-scroll. */
+    /* Fixed (not relative): the native dialog:modal UA stylesheet centres it
+       via position:fixed + inset:0 + margin:auto, relative to the viewport
+       regardless of scroll position. */
     position: fixed;
     width: calc(100% - var(--space-4) * 2);
-    max-width: 620px;
-    max-height: 85vh;
-    overflow-y: auto;
+    max-width: 560px;
+    max-height: 88vh;
     margin: auto;
-    padding: var(--space-5);
+    padding: 0;
     border: none;
-    border-radius: calc(var(--radius) * 2);
+    border-radius: 18px;
     background: var(--sage);
     color: var(--ink);
+    overflow: hidden auto;
   }
 
   .bio-dialog::backdrop {
-    background: rgba(26, 43, 27, 0.6);
+    background: rgba(26, 43, 27, 0.66);
+  }
+
+  .bio-dialog__header {
+    position: sticky;
+    top: 0;
+    text-align: center;
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    background: var(--forest-deep);
+    color: var(--sage);
+  }
+
+  .bio-dialog__portrait {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto var(--space-3);
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(248, 250, 248, 0.1);
+    box-shadow: 0 0 0 1px rgba(248, 250, 248, 0.35);
+  }
+
+  .bio-dialog__name {
+    font-family: var(--font-display);
+    font-weight: var(--weight-display);
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: var(--sage);
+    margin: 0 0 var(--space-1);
+  }
+
+  .bio-dialog__meta {
+    font-size: 0.72rem;
+    font-weight: var(--weight-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sage);
+    opacity: 0.6;
+    margin: 0;
   }
 
   .bio-dialog__close {
     position: absolute;
     top: var(--space-3);
     right: var(--space-3);
-    z-index: 1;
     width: 36px;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    border: 1px solid var(--mist);
-    background: var(--sage);
-    color: var(--forest);
+    border: 1px solid rgba(248, 250, 248, 0.35);
+    background: transparent;
+    color: var(--sage);
     font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;
@@ -1369,62 +1397,18 @@
   }
 
   .bio-dialog__close:hover {
-    background: var(--forest);
-    color: var(--sage);
+    background: var(--sage);
+    color: var(--forest-deep);
   }
 
-  /* Avatar sits to the left of the bio text once the dialog is wide enough
-     — the same circle that was on the card, now "arrived" here (see the
-     view-transition wiring in the script at the bottom of the page). */
-  .bio-dialog__layout {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .bio-dialog__identity {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: var(--space-3);
-  }
-
-  .bio-dialog__avatar-frame {
-    width: 120px;
-    height: 120px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--mist);
-  }
-
-  .bio-dialog__content {
-    text-align: left;
-  }
-
-  .bio-dialog__name {
-    font-family: var(--font-display);
-    font-weight: var(--weight-display);
-    font-size: 1.3rem;
-    color: var(--forest);
-    margin: 0 0 var(--space-1);
-  }
-
-  .bio-dialog__role {
-    font-size: 0.78rem;
-    font-weight: var(--weight-label);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--forest);
-    opacity: 0.8;
-    margin: 0;
+  .bio-dialog__body {
+    padding: var(--space-5);
   }
 
   .bio-dialog__bio {
-    font-size: 0.88rem;
-    line-height: 1.6;
-    margin: 0 0 var(--space-4);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin: 0 0 var(--space-5);
   }
 
   .bio-dialog__expertise-heading {
@@ -1449,7 +1433,7 @@
   .bio-dialog__expertise li {
     position: relative;
     padding-left: var(--space-3);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     opacity: 0.85;
   }
 
@@ -1464,40 +1448,11 @@
     background: var(--forest);
   }
 
-  @media (min-width: 420px) {
+  @media (min-width: 440px) {
     .bio-dialog__expertise {
       grid-template-columns: 1fr 1fr;
       column-gap: var(--space-4);
     }
-  }
-
-  @media (min-width: 600px) {
-    .bio-dialog__layout {
-      flex-direction: row;
-      align-items: flex-start;
-      gap: var(--space-5);
-    }
-
-    .bio-dialog__identity {
-      align-items: flex-start;
-      text-align: left;
-      flex-shrink: 0;
-      width: 140px;
-    }
-
-    .bio-dialog__bio {
-      margin-top: var(--space-2);
-    }
-  }
-
-  /* Shared-element morph between a card avatar and its open dialog's
-     avatar — handled by toggling view-transition-name in JS so only one
-     of the pair carries it at a time (see the script below). Falls back
-     to an instant open/close in browsers without support, and is skipped
-     entirely under prefers-reduced-motion. */
-  ::view-transition-group(*) {
-    animation-duration: 420ms;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 </style>
 </head>
@@ -1778,7 +1733,7 @@
       <div class="team__roots">
         <button class="root reveal" type="button" data-dialog-target="dialog-1" aria-label="Read bio — Chandra Deo, Head Consultant">
           <span class="root__frame">
-            <img class="avatar" data-person="1" src="https://images.unsplash.com/photo-1742981365880-698cfb84492d?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Chandra Deo">
+            <img class="avatar" src="https://images.unsplash.com/photo-1742981365880-698cfb84492d?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Chandra Deo">
           </span>
           <span class="root__body">
             <span class="root__name">Chandra Deo</span>
@@ -1790,7 +1745,7 @@
 
         <button class="root reveal" type="button" data-dialog-target="dialog-2" aria-label="Read bio — Sonali Sarma, Leadership Development and POSH Consultant">
           <span class="root__frame">
-            <img class="avatar" data-person="2" src="https://images.unsplash.com/photo-1770626899426-baed57609a30?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Sonali Sarma">
+            <img class="avatar" src="https://images.unsplash.com/photo-1770626899426-baed57609a30?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Sonali Sarma">
           </span>
           <span class="root__body">
             <span class="root__name">Sonali Sarma</span>
@@ -1802,7 +1757,7 @@
 
         <button class="root reveal" type="button" data-dialog-target="dialog-3" aria-label="Read bio — Adv. Avdhesh Kumar Dubey, Advocate, Supreme Court">
           <span class="root__frame">
-            <img class="avatar" data-person="3" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Adv. Avdhesh Kumar Dubey">
+            <img class="avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Adv. Avdhesh Kumar Dubey">
           </span>
           <span class="root__body">
             <span class="root__name">Adv. Avdhesh Kumar Dubey</span>
@@ -1814,7 +1769,7 @@
 
         <button class="root reveal" type="button" data-dialog-target="dialog-4" aria-label="Read bio — Pravin Parmar, Labour Law Consultant">
           <span class="root__frame">
-            <img class="avatar" data-person="4" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Pravin Parmar">
+            <img class="avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Pravin Parmar">
           </span>
           <span class="root__body">
             <span class="root__name">Pravin Parmar</span>
@@ -1826,7 +1781,7 @@
 
         <button class="root reveal" type="button" data-dialog-target="dialog-5" aria-label="Read bio — Dr. Priyadarshini Deo, Mental Health and Psychosocial Care Consultant">
           <span class="root__frame">
-            <img class="avatar" data-person="5" src="https://images.unsplash.com/photo-1770627016447-cb9d29ed0398?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Dr. Priyadarshini Deo">
+            <img class="avatar" src="https://images.unsplash.com/photo-1770627016447-cb9d29ed0398?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Dr. Priyadarshini Deo">
           </span>
           <span class="root__body">
             <span class="root__name">Dr. Priyadarshini Deo</span>
@@ -1839,147 +1794,127 @@
     </div>
 
     <dialog class="bio-dialog" id="dialog-1" aria-labelledby="dialog-1-title">
-      <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-      <div class="bio-dialog__layout">
-        <div class="bio-dialog__identity">
-          <div class="bio-dialog__avatar-frame">
-            <img class="avatar" data-person="1" src="https://images.unsplash.com/photo-1742981365880-698cfb84492d?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Chandra Deo">
-          </div>
-          <div>
-            <h3 class="bio-dialog__name" id="dialog-1-title">Chandra Deo</h3>
-            <p class="bio-dialog__role">Head Consultant</p>
-          </div>
+      <div class="bio-dialog__header">
+        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
+        <div class="bio-dialog__portrait">
+          <img class="avatar" src="https://images.unsplash.com/photo-1742981365880-698cfb84492d?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Chandra Deo">
         </div>
-        <div class="bio-dialog__content">
-          <p class="bio-dialog__bio">31 years across government regulatory service, corporate HR, and independent compliance consulting — 26 of them as a Central Labour Service Officer with the Ministry of Labour and Employment, retiring as Welfare &amp; Cess Commissioner. MA in Personnel Management and Industrial Relations (TISS Mumbai), LLB (Patna University) — a rare pairing of HR fluency and legal procedure.</p>
-          <h4 class="bio-dialog__expertise-heading">Areas of Expertise</h4>
-          <ul class="bio-dialog__expertise">
-            <li>POSH Compliance &amp; ICC Constitution</li>
-            <li>Government Regulatory Liaison</li>
-            <li>ICC Chairing &amp; External Member Services</li>
-            <li>Workplace Wellbeing Strategy</li>
-            <li>Workplace Investigations</li>
-            <li>Policy Drafting</li>
-            <li>Labour Law Advisory</li>
-            <li>Senior Stakeholder Engagement</li>
-          </ul>
-        </div>
+        <h3 class="bio-dialog__name" id="dialog-1-title">Chandra Deo</h3>
+        <p class="bio-dialog__meta">Head Consultant · 31 years</p>
+      </div>
+      <div class="bio-dialog__body">
+        <p class="bio-dialog__bio">31 years across government regulatory service, corporate HR, and independent compliance consulting — 26 of them as a Central Labour Service Officer with the Ministry of Labour and Employment, retiring as Welfare &amp; Cess Commissioner. MA in Personnel Management and Industrial Relations (TISS Mumbai), LLB (Patna University) — a rare pairing of HR fluency and legal procedure.</p>
+        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
+        <ul class="bio-dialog__expertise">
+          <li>POSH Compliance &amp; ICC Constitution</li>
+          <li>Government Regulatory Liaison</li>
+          <li>ICC Chairing &amp; External Member Services</li>
+          <li>Workplace Wellbeing Strategy</li>
+          <li>Workplace Investigations</li>
+          <li>Policy Drafting</li>
+          <li>Labour Law Advisory</li>
+          <li>Senior Stakeholder Engagement</li>
+        </ul>
       </div>
     </dialog>
 
     <dialog class="bio-dialog" id="dialog-2" aria-labelledby="dialog-2-title">
-      <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-      <div class="bio-dialog__layout">
-        <div class="bio-dialog__identity">
-          <div class="bio-dialog__avatar-frame">
-            <img class="avatar" data-person="2" src="https://images.unsplash.com/photo-1770626899426-baed57609a30?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Sonali Sarma">
-          </div>
-          <div>
-            <h3 class="bio-dialog__name" id="dialog-2-title">Sonali Sarma</h3>
-            <p class="bio-dialog__role">Leadership Development &amp; POSH Consultant</p>
-          </div>
+      <div class="bio-dialog__header">
+        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
+        <div class="bio-dialog__portrait">
+          <img class="avatar" src="https://images.unsplash.com/photo-1770626899426-baed57609a30?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Sonali Sarma">
         </div>
-        <div class="bio-dialog__content">
-          <p class="bio-dialog__bio">37 years in HR, Learning, and Organisation Development across manufacturing, public sector, and multinational companies. Two years ago she moved into the not-for-profit sector while continuing to lead HR — and stayed just as hands-on with plant managers, supervisors, unions, and frontline teams.</p>
-          <h4 class="bio-dialog__expertise-heading">Areas of Expertise</h4>
-          <ul class="bio-dialog__expertise">
-            <li>Leadership Development &amp; Coaching</li>
-            <li>Change Management &amp; Culture Transformation</li>
-            <li>Talent Management &amp; Succession Planning</li>
-            <li>Industrial Relations &amp; Employee Relations</li>
-            <li>POSH Awareness &amp; IC Training</li>
-            <li>Employee Engagement &amp; HR Strategy</li>
-            <li>Conflict &amp; Team Management</li>
-            <li>Competency-Based Leadership &amp; Managerial Capacity Building</li>
-          </ul>
-        </div>
+        <h3 class="bio-dialog__name" id="dialog-2-title">Sonali Sarma</h3>
+        <p class="bio-dialog__meta">Leadership Development &amp; POSH Consultant · 37 years</p>
+      </div>
+      <div class="bio-dialog__body">
+        <p class="bio-dialog__bio">37 years in HR, Learning, and Organisation Development across manufacturing, public sector, and multinational companies. Two years ago she moved into the not-for-profit sector while continuing to lead HR — and stayed just as hands-on with plant managers, supervisors, unions, and frontline teams.</p>
+        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
+        <ul class="bio-dialog__expertise">
+          <li>Leadership Development &amp; Coaching</li>
+          <li>Change Management &amp; Culture Transformation</li>
+          <li>Talent Management &amp; Succession Planning</li>
+          <li>Industrial Relations &amp; Employee Relations</li>
+          <li>POSH Awareness &amp; IC Training</li>
+          <li>Employee Engagement &amp; HR Strategy</li>
+          <li>Conflict &amp; Team Management</li>
+          <li>Competency-Based Leadership &amp; Managerial Capacity Building</li>
+        </ul>
       </div>
     </dialog>
 
     <dialog class="bio-dialog" id="dialog-3" aria-labelledby="dialog-3-title">
-      <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-      <div class="bio-dialog__layout">
-        <div class="bio-dialog__identity">
-          <div class="bio-dialog__avatar-frame">
-            <img class="avatar" data-person="3" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Adv. Avdhesh Kumar Dubey">
-          </div>
-          <div>
-            <h3 class="bio-dialog__name" id="dialog-3-title">Adv. Avdhesh Kumar Dubey</h3>
-            <p class="bio-dialog__role">Advocate, Supreme Court</p>
-          </div>
+      <div class="bio-dialog__header">
+        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
+        <div class="bio-dialog__portrait">
+          <img class="avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Adv. Avdhesh Kumar Dubey">
         </div>
-        <div class="bio-dialog__content">
-          <p class="bio-dialog__bio">Practising advocate before the Supreme Court of India and the night courts, with 15+ years in corporate and family law. Chambers in Mumbai, Delhi, and at the Supreme Court give Samagra direct litigation capability — for POSH and labour matters that move beyond internal resolution into contested proceedings.</p>
-          <h4 class="bio-dialog__expertise-heading">Areas of Expertise</h4>
-          <ul class="bio-dialog__expertise">
-            <li>Supreme Court Litigation</li>
-            <li>Night Court Practice</li>
-            <li>Corporate Law Advisory &amp; Disputes</li>
-            <li>Client Representation in Contested Proceedings</li>
-            <li>Family Law Matters</li>
-            <li>Legal Risk Assessment</li>
-            <li>Escalated POSH &amp; Workplace Litigation</li>
-            <li>Cross-Referral Coordination</li>
-          </ul>
-        </div>
+        <h3 class="bio-dialog__name" id="dialog-3-title">Adv. Avdhesh Kumar Dubey</h3>
+        <p class="bio-dialog__meta">Advocate, Supreme Court · 15+ years</p>
+      </div>
+      <div class="bio-dialog__body">
+        <p class="bio-dialog__bio">Practising advocate before the Supreme Court of India and the night courts, with 15+ years in corporate and family law. Chambers in Mumbai, Delhi, and at the Supreme Court give Samagra direct litigation capability — for POSH and labour matters that move beyond internal resolution into contested proceedings.</p>
+        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
+        <ul class="bio-dialog__expertise">
+          <li>Supreme Court Litigation</li>
+          <li>Night Court Practice</li>
+          <li>Corporate Law Advisory &amp; Disputes</li>
+          <li>Client Representation in Contested Proceedings</li>
+          <li>Family Law Matters</li>
+          <li>Legal Risk Assessment</li>
+          <li>Escalated POSH &amp; Workplace Litigation</li>
+          <li>Cross-Referral Coordination</li>
+        </ul>
       </div>
     </dialog>
 
     <dialog class="bio-dialog" id="dialog-4" aria-labelledby="dialog-4-title">
-      <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-      <div class="bio-dialog__layout">
-        <div class="bio-dialog__identity">
-          <div class="bio-dialog__avatar-frame">
-            <img class="avatar" data-person="4" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Pravin Parmar">
-          </div>
-          <div>
-            <h3 class="bio-dialog__name" id="dialog-4-title">Pravin Parmar</h3>
-            <p class="bio-dialog__role">Labour Law Consultant</p>
-          </div>
+      <div class="bio-dialog__header">
+        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
+        <div class="bio-dialog__portrait">
+          <img class="avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Pravin Parmar">
         </div>
-        <div class="bio-dialog__content">
-          <p class="bio-dialog__bio">26 years with the Government of India's Central Labour Service — Assistant Labour Commissioner, Welfare Commissioner, then Labour Welfare Commissioner. Has argued service matters before the Central Administrative Tribunal and High Court, and trained PSUs including BSNL, Power Grid, and Ordnance Factory on labour law.</p>
-          <h4 class="bio-dialog__expertise-heading">Areas of Expertise</h4>
-          <ul class="bio-dialog__expertise">
-            <li>Labour Law Implementation &amp; Compliance</li>
-            <li>Labour Welfare Administration</li>
-            <li>Industrial Relations &amp; Industrial Peace</li>
-            <li>PSU Labour Law Training</li>
-            <li>Service Matters — CAT &amp; High Court</li>
-            <li>Union–Management Relations Training</li>
-            <li>Disciplinary Proceedings &amp; Domestic Enquiries</li>
-            <li>Complex Industrial Dispute Resolution</li>
-          </ul>
-        </div>
+        <h3 class="bio-dialog__name" id="dialog-4-title">Pravin Parmar</h3>
+        <p class="bio-dialog__meta">Labour Law Consultant · 26 years</p>
+      </div>
+      <div class="bio-dialog__body">
+        <p class="bio-dialog__bio">26 years with the Government of India's Central Labour Service — Assistant Labour Commissioner, Welfare Commissioner, then Labour Welfare Commissioner. Has argued service matters before the Central Administrative Tribunal and High Court, and trained PSUs including BSNL, Power Grid, and Ordnance Factory on labour law.</p>
+        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
+        <ul class="bio-dialog__expertise">
+          <li>Labour Law Implementation &amp; Compliance</li>
+          <li>Labour Welfare Administration</li>
+          <li>Industrial Relations &amp; Industrial Peace</li>
+          <li>PSU Labour Law Training</li>
+          <li>Service Matters — CAT &amp; High Court</li>
+          <li>Union–Management Relations Training</li>
+          <li>Disciplinary Proceedings &amp; Domestic Enquiries</li>
+          <li>Complex Industrial Dispute Resolution</li>
+        </ul>
       </div>
     </dialog>
 
     <dialog class="bio-dialog" id="dialog-5" aria-labelledby="dialog-5-title">
-      <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-      <div class="bio-dialog__layout">
-        <div class="bio-dialog__identity">
-          <div class="bio-dialog__avatar-frame">
-            <img class="avatar" data-person="5" src="https://images.unsplash.com/photo-1770627016447-cb9d29ed0398?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Dr. Priyadarshini Deo">
-          </div>
-          <div>
-            <h3 class="bio-dialog__name" id="dialog-5-title">Dr. Priyadarshini Deo</h3>
-            <p class="bio-dialog__role">Mental Health &amp; Psychosocial Care Consultant</p>
-          </div>
+      <div class="bio-dialog__header">
+        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
+        <div class="bio-dialog__portrait">
+          <img class="avatar" src="https://images.unsplash.com/photo-1770627016447-cb9d29ed0398?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Dr. Priyadarshini Deo">
         </div>
-        <div class="bio-dialog__content">
-          <p class="bio-dialog__bio">Mental health and psychosocial care specialist — MA in Medical &amp; Psychiatric Social Work (TISS Mumbai), PhD in Psychology (SNDT). Senior Counsellor at Kokilaben Hospital's Centre for Cancer &amp; Palliative Care since 2009, with deep experience in grief, bereavement, and caregiver support.</p>
-          <h4 class="bio-dialog__expertise-heading">Areas of Expertise</h4>
-          <ul class="bio-dialog__expertise">
-            <li>Counselling Across Age Groups &amp; Major Mental Illnesses</li>
-            <li>Psychiatric Social Work</li>
-            <li>Grief &amp; Bereavement Counselling</li>
-            <li>PhD Guide — Psychology &amp; Social Work</li>
-            <li>Palliative &amp; End-of-Life Care Counselling</li>
-            <li>Fieldwork Supervision</li>
-            <li>Caregiver Support Counselling</li>
-            <li>International Professional Exchange</li>
-          </ul>
-        </div>
+        <h3 class="bio-dialog__name" id="dialog-5-title">Dr. Priyadarshini Deo</h3>
+        <p class="bio-dialog__meta">Mental Health &amp; Psychosocial Care Consultant · 16+ years</p>
+      </div>
+      <div class="bio-dialog__body">
+        <p class="bio-dialog__bio">Mental health and psychosocial care specialist — MA in Medical &amp; Psychiatric Social Work (TISS Mumbai), PhD in Psychology (SNDT). Senior Counsellor at Kokilaben Hospital's Centre for Cancer &amp; Palliative Care since 2009, with deep experience in grief, bereavement, and caregiver support.</p>
+        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
+        <ul class="bio-dialog__expertise">
+          <li>Counselling Across Age Groups &amp; Major Mental Illnesses</li>
+          <li>Psychiatric Social Work</li>
+          <li>Grief &amp; Bereavement Counselling</li>
+          <li>PhD Guide — Psychology &amp; Social Work</li>
+          <li>Palliative &amp; End-of-Life Care Counselling</li>
+          <li>Fieldwork Supervision</li>
+          <li>Caregiver Support Counselling</li>
+          <li>International Professional Exchange</li>
+        </ul>
       </div>
     </dialog>
   </section>
@@ -2089,73 +2024,23 @@
     var dialogs = document.querySelectorAll('.bio-dialog');
     if (!dialogs.length) return;
 
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function withTransition(run) {
-      if (document.startViewTransition && !reduceMotion) {
-        // ready/finished reject (logging an unhandled rejection) whenever
-        // a transition gets skipped, e.g. a second open/close fires before
-        // the first one settles — harmless, but needs a catch so it
-        // doesn't surface as a console error.
-        var transition = document.startViewTransition(run);
-        transition.ready.catch(function () {});
-        transition.finished.catch(function () {});
-      } else {
-        run();
-      }
-    }
+    document.querySelectorAll('.root[data-dialog-target]').forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        var dialog = document.getElementById(trigger.getAttribute('data-dialog-target'));
+        if (dialog) dialog.showModal();
+      });
+    });
 
     dialogs.forEach(function (dialog) {
-      var personId = dialog.id.replace('dialog-', '');
-      var cardAvatar = document.querySelector('.team__roots img[data-person="' + personId + '"]');
-      var cardAvatarFrame = cardAvatar ? cardAvatar.closest('.root__frame') : null;
-      var dialogAvatar = dialog.querySelector('.bio-dialog__avatar-frame img');
-      var trigger = document.querySelector('.root[data-dialog-target="' + dialog.id + '"]');
-
-      function openDialog() {
-        withTransition(function () {
-          // Hand the shared view-transition-name from the card avatar to
-          // the dialog avatar — only one can hold it at a time, which is
-          // what makes the browser morph one into the other instead of
-          // cross-fading two unrelated circles.
-          if (cardAvatar) {
-            cardAvatar.style.viewTransitionName = '';
-            if (cardAvatarFrame) cardAvatarFrame.classList.add('root__frame--away');
-          }
-          dialogAvatar.style.viewTransitionName = 'avatar-' + personId;
-          dialog.showModal();
-        });
-      }
-
-      function closeDialog() {
-        withTransition(function () {
-          dialogAvatar.style.viewTransitionName = '';
-          if (cardAvatar) {
-            if (cardAvatarFrame) cardAvatarFrame.classList.remove('root__frame--away');
-            cardAvatar.style.viewTransitionName = 'avatar-' + personId;
-          }
-          dialog.close();
-        });
-      }
-
-      if (trigger) trigger.addEventListener('click', openDialog);
-
-      dialog.querySelector('.bio-dialog__close').addEventListener('click', closeDialog);
-
-      // Native <dialog> only closes on backdrop click if we wire it up
-      // ourselves — a click lands directly on the dialog element (not a
-      // descendant) only when it's outside the content box, i.e. on the
-      // backdrop.
-      dialog.addEventListener('click', function (event) {
-        if (event.target === dialog) closeDialog();
+      dialog.querySelector('.bio-dialog__close').addEventListener('click', function () {
+        dialog.close();
       });
 
-      // ESC fires native "cancel" + an immediate close, with no chance for
-      // our transition to run. Intercept it and drive the close ourselves
-      // so ESC gets the same animated handoff as the other close paths.
-      dialog.addEventListener('cancel', function (event) {
-        event.preventDefault();
-        closeDialog();
+      // Native <dialog> doesn't close on backdrop click on its own — a click
+      // lands directly on the dialog element (not a descendant) only when
+      // it's on the backdrop outside the content, so use that to dismiss.
+      dialog.addEventListener('click', function (event) {
+        if (event.target === dialog) dialog.close();
       });
     });
   })();
