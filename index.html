@@ -54,6 +54,15 @@
     font-size: 18px;
     scroll-behavior: smooth;
     scroll-padding-top: var(--nav-height);
+    /* Proximity (not mandatory): when you stop scrolling near a section
+       boundary it settles onto that section, but you're never trapped
+       mid-scroll inside a section taller than the viewport. */
+    scroll-snap-type: y proximity;
+  }
+
+  .hero,
+  .section {
+    scroll-snap-align: start;
   }
 
   /* Base typography */
@@ -1123,8 +1132,8 @@
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 72px 1fr;
-    align-items: start;
+    grid-template-columns: 96px 1fr;
+    align-items: center;
     gap: var(--space-4);
     width: 100%;
     padding: 0;
@@ -1142,18 +1151,18 @@
   .root::before {
     content: '';
     position: absolute;
-    left: 36px;
-    top: -24px;
+    left: 48px;
+    top: -26px;
     width: 1px;
-    height: 18px;
+    height: 20px;
     transform: translateX(-50%);
     background: rgba(248, 250, 248, 0.22);
   }
 
   .root__frame {
     position: relative;
-    width: 72px;
-    height: 72px;
+    width: 96px;
+    height: 96px;
     border-radius: 50%;
     overflow: hidden;
     background: var(--forest-deep);
@@ -1189,27 +1198,28 @@
     display: block;
     font-family: var(--font-display);
     font-weight: var(--weight-display);
-    font-size: 1.15rem;
+    font-size: 1.35rem;
+    line-height: 1.2;
     color: var(--sage);
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
 
   .root__role {
     display: block;
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     line-height: 1.4;
     color: var(--sage);
-    opacity: 0.62;
+    opacity: 0.64;
     margin-bottom: var(--space-2);
   }
 
   .root__years {
     display: block;
-    font-size: 0.66rem;
+    font-size: 0.72rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--sage);
-    opacity: 0.45;
+    opacity: 0.5;
     margin-bottom: var(--space-3);
   }
 
@@ -1220,7 +1230,7 @@
     gap: 6px;
     font-family: var(--font-body);
     font-weight: var(--weight-label);
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     color: var(--sage);
   }
 
@@ -1289,9 +1299,13 @@
     }
 
     .root__frame {
-      width: 104px;
-      height: 104px;
-      margin-bottom: var(--space-4);
+      width: 152px;
+      height: 152px;
+      margin-bottom: var(--space-5);
+    }
+
+    .root__name {
+      font-size: 1.45rem;
     }
 
     /* Fill the row so the cue pins to a shared bottom baseline regardless of
