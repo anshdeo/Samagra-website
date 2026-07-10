@@ -477,11 +477,11 @@
       opacity: 0.38 !important;
     }
 
-    .btn--primary:hover {
-      transform: none !important;
-    }
-
-    .stats__item:hover {
+    .btn--primary:hover,
+    .btn--dark:hover,
+    .stats__item:hover,
+    .step:hover,
+    .team__row-link:hover svg {
       transform: none !important;
     }
   }
@@ -1087,15 +1087,24 @@
     position: relative;
     display: grid;
     grid-template-columns: 88px 1fr;
-    gap: var(--space-4);
+    grid-template-areas:
+      "marker body"
+      "marker link";
+    column-gap: var(--space-4);
+    row-gap: var(--space-2);
     padding: var(--space-5) 0;
     border-bottom: 1px solid var(--mist);
   }
 
   .team__row-marker {
+    grid-area: marker;
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .team__row-body {
+    grid-area: body;
   }
 
   /* Applied directly to the <img> — sizing/shape comes from the
@@ -1185,13 +1194,15 @@
     line-height: 1.55;
     opacity: 0.7;
     max-width: 52ch;
-    margin: 0 0 var(--space-3);
+    margin: 0;
   }
 
   .team__row-link {
+    grid-area: link;
     position: relative;
     display: inline-flex;
     align-items: center;
+    justify-self: start;
     gap: 6px;
     min-height: 44px;
     background: none;
@@ -1234,8 +1245,9 @@
   @media (min-width: 640px) {
     .team__row {
       grid-template-columns: 96px 1fr auto;
+      grid-template-areas: "marker body link";
       align-items: center;
-      gap: var(--space-5);
+      column-gap: var(--space-5);
     }
 
     .team__row-marker {
@@ -1716,15 +1728,15 @@
             <span class="team__row-years"><strong>31</strong><span>years</span></span>
             <span class="team__row-connector" aria-hidden="true"></span>
           </div>
-          <div>
+          <div class="team__row-body">
             <h3 class="team__row-name">Chandra Deo</h3>
             <p class="team__row-role">Head Consultant</p>
             <p class="team__row-desc">POSH compliance, ICC chairing, labour law advisory.</p>
-            <button class="team__row-link" type="button" data-dialog-target="dialog-1" aria-haspopup="dialog">
-              Read full bio
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
           </div>
+          <button class="team__row-link" type="button" data-dialog-target="dialog-1" aria-haspopup="dialog">
+            Read full bio
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
 
         <div class="team__row reveal">
@@ -1735,15 +1747,15 @@
             <span class="team__row-years"><strong>37</strong><span>years</span></span>
             <span class="team__row-connector" aria-hidden="true"></span>
           </div>
-          <div>
+          <div class="team__row-body">
             <h3 class="team__row-name">Sonali Sarma</h3>
             <p class="team__row-role">Leadership Development &amp; POSH Consultant</p>
             <p class="team__row-desc">Leadership training, IC representation, organisation-building.</p>
-            <button class="team__row-link" type="button" data-dialog-target="dialog-2" aria-haspopup="dialog">
-              Read full bio
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
           </div>
+          <button class="team__row-link" type="button" data-dialog-target="dialog-2" aria-haspopup="dialog">
+            Read full bio
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
 
         <div class="team__row reveal">
@@ -1754,15 +1766,15 @@
             <span class="team__row-years"><strong>15+</strong><span>years</span></span>
             <span class="team__row-connector" aria-hidden="true"></span>
           </div>
-          <div>
+          <div class="team__row-body">
             <h3 class="team__row-name">Adv. Avdhesh Kumar Dubey</h3>
             <p class="team__row-role">Advocate, Supreme Court</p>
             <p class="team__row-desc">Litigation support for contested and escalated matters.</p>
-            <button class="team__row-link" type="button" data-dialog-target="dialog-3" aria-haspopup="dialog">
-              Read full bio
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
           </div>
+          <button class="team__row-link" type="button" data-dialog-target="dialog-3" aria-haspopup="dialog">
+            Read full bio
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
 
         <div class="team__row reveal">
@@ -1773,15 +1785,15 @@
             <span class="team__row-years"><strong>26</strong><span>years</span></span>
             <span class="team__row-connector" aria-hidden="true"></span>
           </div>
-          <div>
+          <div class="team__row-body">
             <h3 class="team__row-name">Pravin Parmar</h3>
             <p class="team__row-role">Labour Law Consultant</p>
             <p class="team__row-desc">Labour law compliance, industrial relations, CAT &amp; High Court matters.</p>
-            <button class="team__row-link" type="button" data-dialog-target="dialog-4" aria-haspopup="dialog">
-              Read full bio
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
           </div>
+          <button class="team__row-link" type="button" data-dialog-target="dialog-4" aria-haspopup="dialog">
+            Read full bio
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
 
         <div class="team__row reveal">
@@ -1792,15 +1804,15 @@
             <span class="team__row-years"><strong>16+</strong><span>years</span></span>
             <span class="team__row-connector" aria-hidden="true"></span>
           </div>
-          <div>
+          <div class="team__row-body">
             <h3 class="team__row-name">Dr. Priyadarshini Deo</h3>
             <p class="team__row-role">Mental Health &amp; Psychosocial Care Consultant</p>
             <p class="team__row-desc">Counselling, grief support, and psychosocial care.</p>
-            <button class="team__row-link" type="button" data-dialog-target="dialog-5" aria-haspopup="dialog">
-              Read full bio
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
           </div>
+          <button class="team__row-link" type="button" data-dialog-target="dialog-5" aria-haspopup="dialog">
+            Read full bio
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
       </div>
     </div>
@@ -1965,9 +1977,20 @@
     var toggle = document.getElementById('nav-toggle');
     var menu = document.getElementById('nav-menu');
 
+    function closeMenu() {
+      menu.classList.remove('nav__menu--open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
     toggle.addEventListener('click', function () {
       var isOpen = menu.classList.toggle('nav__menu--open');
       toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Tapping a link in the open mobile menu should dismiss it — otherwise
+    // the overlay stays up covering the section the user just jumped to.
+    menu.addEventListener('click', function (event) {
+      if (event.target.closest('.nav__link')) closeMenu();
     });
   })();
 
