@@ -54,16 +54,6 @@
     font-size: 18px;
     scroll-behavior: smooth;
     scroll-padding-top: var(--nav-height);
-    /* Proximity (not mandatory): when you stop scrolling near a section
-       boundary it settles onto that section, but you're never trapped
-       mid-scroll inside a section taller than the viewport. */
-    scroll-snap-type: y proximity;
-  }
-
-  .hero,
-  .section,
-  .footer {
-    scroll-snap-align: start;
   }
 
   /* Base typography */
@@ -2378,6 +2368,90 @@
 
     window.addEventListener('scroll', updateNavBackground, { passive: true });
     updateNavBackground();
+  })();
+
+  // Gentle proximity snap. CSS scroll-snap corrects position instantly with
+  // no duration control, which read as an abrupt jump; this waits for the
+  // scroll to go idle and — only if you've settled near a section boundary —
+  // eases onto it over a controlled duration. Deep inside a tall section it
+  // leaves you alone, and any real scroll input cancels an in-flight snap.
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var nav = document.getElementById('nav');
+    var sections = Array.prototype.slice.call(
+      document.querySelectorAll('.hero, .section, .footer')
+    );
+    if (!sections.length) return;
+
+    var DURATION = 560;
+    var IDLE_MS = 150;
+    var snapping = false;
+    var rafId = null;
+    var idleTimer = null;
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function cancelAnim() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      snapping = false;
+    }
+
+    function animateTo(targetY) {
+      var startY = window.scrollY;
+      var dist = targetY - startY;
+      if (Math.abs(dist) < 2) return;
+      var startTime = null;
+      snapping = true;
+      rafId = requestAnimationFrame(function step(ts) {
+        if (startTime === null) startTime = ts;
+        var p = Math.min(1, (ts - startTime) / DURATION);
+        // behavior:'instant' so the page's scroll-behavior:smooth doesn't
+        // re-animate each step and fight this manual easing.
+        window.scrollTo({ top: Math.round(startY + dist * easeInOutCubic(p)), behavior: 'instant' });
+        if (p < 1) {
+          rafId = requestAnimationFrame(step);
+        } else {
+          rafId = null;
+          snapping = false;
+        }
+      });
+    }
+
+    function maybeSnap() {
+      if (snapping) return;
+      var navH = nav.offsetHeight;
+      var best = null;
+      var bestDist = Infinity;
+      sections.forEach(function (section) {
+        var target = Math.max(0, section.offsetTop - navH);
+        var d = Math.abs(target - window.scrollY);
+        if (d < bestDist) { bestDist = d; best = target; }
+      });
+      // Only pull you in from nearby (proximity); if you've deliberately
+      // stopped deep in a section, stay put.
+      var threshold = window.innerHeight * 0.3;
+      if (best !== null && bestDist > 3 && bestDist < threshold) {
+        animateTo(best);
+      }
+    }
+
+    window.addEventListener('scroll', function () {
+      if (snapping) return;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(maybeSnap, IDLE_MS);
+    }, { passive: true });
+
+    // A genuine scroll gesture during a snap cancels it — never fight the user.
+    var scrollKeys = { ArrowUp: 1, ArrowDown: 1, PageUp: 1, PageDown: 1, Home: 1, End: 1, ' ': 1 };
+    ['wheel', 'touchstart'].forEach(function (ev) {
+      window.addEventListener(ev, function () { if (snapping) cancelAnim(); }, { passive: true });
+    });
+    window.addEventListener('keydown', function (e) {
+      if (snapping && scrollKeys[e.key]) cancelAnim();
+    });
   })();
 
   // Scroll-spy: highlight the nav link for the section the reader is in —
