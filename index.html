@@ -93,20 +93,21 @@
     padding: var(--space-6) 0;
   }
 
-  .section--placeholder {
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-bottom: 1px dashed var(--mist);
+  /* Section kicker — the small uppercase label above a section heading.
+     Shared across sections so the headers read as one system. */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-weight: var(--weight-label);
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--forest);
+    opacity: 0.55;
+    margin: 0 0 var(--space-2);
   }
 
-  .section--placeholder-text {
-    font-weight: var(--weight-label);
-    color: var(--forest);
-    opacity: 0.5;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  .eyebrow--on-dark {
+    color: var(--sage);
   }
 
   /* Nav: transparent over the hero photo, solid once scrolled past it */
@@ -1067,16 +1068,6 @@
     color: var(--sage);
   }
 
-  .team__eyebrow {
-    font-family: var(--font-body);
-    font-weight: var(--weight-label);
-    font-size: 0.75rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--sage);
-    opacity: 0.55;
-    margin: 0 0 var(--space-2);
-  }
 
   .team__heading {
     font-family: var(--font-display);
@@ -1459,17 +1450,6 @@
     gap: var(--space-6);
   }
 
-  .contact__eyebrow {
-    font-family: var(--font-body);
-    font-weight: var(--weight-label);
-    font-size: 0.75rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--forest);
-    opacity: 0.55;
-    margin: 0 0 var(--space-2);
-  }
-
   .contact__heading {
     font-family: var(--font-display);
     font-weight: var(--weight-display);
@@ -1834,6 +1814,7 @@
     <div class="container">
       <div class="why-samagra__grid">
         <div class="why-samagra__text">
+          <p class="eyebrow reveal">Integrated by design</p>
           <h2 class="why-samagra__heading reveal">Why Samagra</h2>
           <p class="reveal"><em>Samagra</em> means whole. Most firms split labour law, HR, training, and wellbeing across vendors who never talk to each other. We put five specialists under one roof instead — so when one issue touches all four, the right person's already in the room.</p>
         </div>
@@ -1906,6 +1887,7 @@
     <div class="identity__tint"></div>
     <div class="identity__grid">
       <div class="identity__text">
+        <p class="eyebrow eyebrow--on-dark reveal">Our identity</p>
         <h2 class="identity__heading reveal">One Tree, Five Roots</h2>
         <p class="reveal">Our emblem is a banyan tree. Its aerial roots are unique — each one draws nourishment on its own, yet all of them hold up the same canopy. That's Samagra: five independent experts, one shared purpose.</p>
         <p class="reveal">A POSH case turns into a labour law question. A labour dispute reveals an HR gap. We built the firm so the right expert is already in the room when that happens — not a phone call away.</p>
@@ -1930,6 +1912,7 @@
 
   <section id="what-we-do" class="section what-we-do">
     <div class="container">
+      <p class="eyebrow reveal">Five practices, one team</p>
       <h2 class="what-we-do__heading reveal">What We Do</h2>
 
       <div class="what-we-do__grid">
@@ -1998,6 +1981,7 @@
 
   <section id="how-we-work" class="section how-we-work">
     <div class="container">
+      <p class="eyebrow reveal">Built ground-up</p>
       <h2 class="how-we-work__heading reveal">How We Work</h2>
       <p class="how-we-work__intro reveal">A ground-up progression, not parallel workstreams — each layer depends on the one before it.</p>
 
@@ -2041,7 +2025,7 @@
 
   <section id="team" class="section team">
     <div class="container">
-      <p class="team__eyebrow reveal">One canopy · five roots</p>
+      <p class="eyebrow eyebrow--on-dark reveal">One canopy · five roots</p>
       <h2 class="team__heading reveal">Meet the team</h2>
       <p class="team__intro reveal">Each an independent expert who could stand alone — all anchored to one shared purpose. Tap anyone to read their background.</p>
 
@@ -2238,7 +2222,7 @@
     <div class="container">
       <div class="contact__grid">
         <div class="contact__intro-col">
-          <p class="contact__eyebrow reveal">Get in touch</p>
+          <p class="eyebrow reveal">Get in touch</p>
           <h2 class="contact__heading reveal">Tell us what you're facing</h2>
           <p class="contact__intro reveal">A compliance question, a POSH case, an HR knot to untangle — send it over and the right expert gets back to you.</p>
           <ul class="contact__direct reveal">
@@ -2368,90 +2352,6 @@
 
     window.addEventListener('scroll', updateNavBackground, { passive: true });
     updateNavBackground();
-  })();
-
-  // Gentle proximity snap. CSS scroll-snap corrects position instantly with
-  // no duration control, which read as an abrupt jump; this waits for the
-  // scroll to go idle and — only if you've settled near a section boundary —
-  // eases onto it over a controlled duration. Deep inside a tall section it
-  // leaves you alone, and any real scroll input cancels an in-flight snap.
-  (function () {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    var nav = document.getElementById('nav');
-    var sections = Array.prototype.slice.call(
-      document.querySelectorAll('.hero, .section, .footer')
-    );
-    if (!sections.length) return;
-
-    var DURATION = 560;
-    var IDLE_MS = 150;
-    var snapping = false;
-    var rafId = null;
-    var idleTimer = null;
-
-    function easeInOutCubic(t) {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    function cancelAnim() {
-      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-      snapping = false;
-    }
-
-    function animateTo(targetY) {
-      var startY = window.scrollY;
-      var dist = targetY - startY;
-      if (Math.abs(dist) < 2) return;
-      var startTime = null;
-      snapping = true;
-      rafId = requestAnimationFrame(function step(ts) {
-        if (startTime === null) startTime = ts;
-        var p = Math.min(1, (ts - startTime) / DURATION);
-        // behavior:'instant' so the page's scroll-behavior:smooth doesn't
-        // re-animate each step and fight this manual easing.
-        window.scrollTo({ top: Math.round(startY + dist * easeInOutCubic(p)), behavior: 'instant' });
-        if (p < 1) {
-          rafId = requestAnimationFrame(step);
-        } else {
-          rafId = null;
-          snapping = false;
-        }
-      });
-    }
-
-    function maybeSnap() {
-      if (snapping) return;
-      var navH = nav.offsetHeight;
-      var best = null;
-      var bestDist = Infinity;
-      sections.forEach(function (section) {
-        var target = Math.max(0, section.offsetTop - navH);
-        var d = Math.abs(target - window.scrollY);
-        if (d < bestDist) { bestDist = d; best = target; }
-      });
-      // Only pull you in from nearby (proximity); if you've deliberately
-      // stopped deep in a section, stay put.
-      var threshold = window.innerHeight * 0.3;
-      if (best !== null && bestDist > 3 && bestDist < threshold) {
-        animateTo(best);
-      }
-    }
-
-    window.addEventListener('scroll', function () {
-      if (snapping) return;
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(maybeSnap, IDLE_MS);
-    }, { passive: true });
-
-    // A genuine scroll gesture during a snap cancels it — never fight the user.
-    var scrollKeys = { ArrowUp: 1, ArrowDown: 1, PageUp: 1, PageDown: 1, Home: 1, End: 1, ' ': 1 };
-    ['wheel', 'touchstart'].forEach(function (ev) {
-      window.addEventListener(ev, function () { if (snapping) cancelAnim(); }, { passive: true });
-    });
-    window.addEventListener('keydown', function (e) {
-      if (snapping && scrollKeys[e.key]) cancelAnim();
-    });
   })();
 
   // Scroll-spy: highlight the nav link for the section the reader is in —
