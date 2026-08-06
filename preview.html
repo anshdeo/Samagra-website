@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion options — Samagra preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #2C3B2D; --forest-deep: #1A2B1B; --sage: #F8FAF8;
+    --stone: #E9E4D8; --ink: #1A1A1A; --mist: #D6D6D6;
+    --display: 'Lora', serif; --body: 'Jost', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: var(--body); color: var(--ink); background: var(--sage); line-height: 1.5; }
+  h1, h2, h3, p { margin: 0; }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* Preview chrome */
+  .pv-head { background: var(--forest-deep); color: var(--sage); padding: 40px 0 32px; }
+  .pv-head h1 { font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 4vw, 2.3rem); }
+  .pv-head p { opacity: 0.75; margin-top: 10px; max-width: 640px; }
+  .pv-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .pv-legend a { font-size: 0.8rem; letter-spacing: 0.05em; text-decoration: none; color: var(--sage);
+    border: 1px solid rgba(248,250,248,0.3); border-radius: 999px; padding: 6px 14px; }
+  .pv-legend a:hover { background: var(--sage); color: var(--forest-deep); }
+
+  .opt { padding: 56px 0; border-bottom: 1px solid var(--mist); }
+  .opt__tag { display: inline-block; font-weight: 500; font-size: 0.72rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--forest); opacity: 0.55; }
+  .opt__title { font-family: var(--display); font-weight: 700; font-size: 1.5rem; color: var(--forest); margin: 6px 0 6px; }
+  .opt__desc { font-size: 0.95rem; opacity: 0.8; max-width: 620px; margin-bottom: 26px; }
+  .opt__demo { }
+  .replay { margin-top: 20px; font-family: var(--body); font-weight: 500; font-size: 0.8rem; cursor: pointer;
+    background: var(--forest); color: var(--sage); border: none; border-radius: 4px; padding: 9px 16px; }
+  .replay:hover { background: var(--forest-deep); }
+
+  /* ---------- A. Marquee band ---------- */
+  .marquee { background: var(--forest-deep); color: var(--sage); padding: 20px 0; overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .marquee__track { display: flex; width: max-content; animation: marquee 22s linear infinite; }
+  .marquee__track span { font-family: var(--display); font-size: 1.25rem; padding: 0 28px; white-space: nowrap; }
+  .marquee__track span::after { content: '·'; margin-left: 56px; opacity: 0.5; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  /* ---------- B. Count-up stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .stat { text-align: center; padding: 24px 8px; border-left: 1px solid var(--mist); }
+  .stat:first-child { border-left: none; }
+  .stat__num { font-family: var(--display); font-weight: 700; font-size: clamp(2.5rem, 8vw, 4rem); color: var(--forest); line-height: 1; }
+  .stat__label { font-size: 0.9rem; opacity: 0.8; margin-top: 8px; display: block; }
+
+  /* ---------- C. Rotating hero word ---------- */
+  .hero-demo { background: var(--forest); color: var(--sage); border-radius: 8px; padding: 56px 32px; text-align: center; }
+  .hero-demo h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 4.5vw, 2.6rem); line-height: 1.25; }
+  .rot { display: inline-block; position: relative; color: var(--stone); }
+  .rot__word { display: inline-block; transition: opacity 320ms ease, transform 320ms ease; }
+  .rot__word.is-out { opacity: 0; transform: translateY(-12px); }
+  .rot__word.is-in { opacity: 0; transform: translateY(12px); }
+
+  /* ---------- D. Parallax ---------- */
+  .px { position: relative; height: 380px; border-radius: 8px; overflow: hidden; }
+  .px__img { position: absolute; left: 0; right: 0; top: -18%; height: 136%;
+    background-image: url('./source/images/backgrounds/banyan-canopy.jpg');
+    background-size: cover; background-position: center; will-change: transform; }
+  .px__tint { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(26,43,27,0.4), rgba(26,43,27,0.7)); }
+  .px__cap { position: absolute; inset: auto 0 0 0; padding: 28px 32px; color: var(--sage); }
+  .px__cap h3 { font-family: var(--display); font-weight: 700; font-size: 1.6rem; }
+
+  /* ---------- E. Word-by-word heading reveal ---------- */
+  .reveal-demo h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 4.5vw, 2.6rem); color: var(--forest); line-height: 1.2; }
+  .rv-word { display: inline-block; opacity: 0; transform: translateY(18px); }
+  .rv-word.go { opacity: 1; transform: none; transition: opacity 520ms ease, transform 520ms ease; }
+
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: 1fr; }
+    .stat { border-left: none; border-top: 1px solid var(--mist); }
+    .stat:first-child { border-top: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="pv-head">
+  <div class="wrap">
+    <h1>Motion options — live preview</h1>
+    <p>Five ideas, running for real with the site's fonts and colours. Scroll through, then tell me which one(s) you want in the actual site (e.g. “A and C”). Nothing here is on the live site yet.</p>
+    <nav class="pv-legend">
+      <a href="#a">A · Marquee</a>
+      <a href="#b">B · Count-up stats</a>
+      <a href="#c">C · Rotating word</a>
+      <a href="#d">D · Parallax</a>
+      <a href="#e">E · Word reveal</a>
+    </nav>
+  </div>
+</header>
+
+<!-- A -->
+<section class="opt" id="a">
+  <div class="wrap">
+    <span class="opt__tag">Option A</span>
+    <h2 class="opt__title">Marquee band</h2>
+    <p class="opt__desc">A slow, continuous horizontal ribbon of the five practices — a quiet strip you could drop between sections.</p>
+  </div>
+  <div class="opt__demo">
+    <div class="marquee">
+      <div class="marquee__track" id="mq"></div>
+    </div>
+  </div>
+</section>
+
+<!-- B -->
+<section class="opt" id="b">
+  <div class="wrap">
+    <span class="opt__tag">Option B</span>
+    <h2 class="opt__title">Count-up stats</h2>
+    <p class="opt__desc">The impact numbers tick up from zero when they scroll into view. (They just ran as you arrived — hit replay to see it again.)</p>
+    <div class="stats" id="stats">
+      <div class="stat"><span class="stat__num" data-count="5">0</span><span class="stat__label">Independent experts, one shared purpose</span></div>
+      <div class="stat"><span class="stat__num" data-count="50+">0</span><span class="stat__label">Years combined inside India's Central Labour Service</span></div>
+      <div class="stat"><span class="stat__num" data-count="31">0</span><span class="stat__label">Years held by our Head Consultant alone</span></div>
+    </div>
+    <button class="replay" data-replay="stats">↻ Replay</button>
+  </div>
+</section>
+
+<!-- C -->
+<section class="opt" id="c">
+  <div class="wrap">
+    <span class="opt__tag">Option C</span>
+    <h2 class="opt__title">Rotating hero word</h2>
+    <p class="opt__desc">The last word of the hero headline gently cycles through a few options, on a loop.</p>
+    <div class="hero-demo">
+      <h2>One tree. Five roots.<br>Every workplace challenge, <span class="rot"><span class="rot__word" id="rot">held.</span></span></h2>
+    </div>
+  </div>
+</section>
+
+<!-- D -->
+<section class="opt" id="d">
+  <div class="wrap">
+    <span class="opt__tag">Option D</span>
+    <h2 class="opt__title">Banyan parallax</h2>
+    <p class="opt__desc">The tree image drifts slower than the page as you scroll, adding depth. Scroll this section up and down to feel it.</p>
+    <div class="px" id="px">
+      <div class="px__img" id="pximg"></div>
+      <div class="px__tint"></div>
+      <div class="px__cap"><h3>One Tree, Five Roots</h3></div>
+    </div>
+  </div>
+</section>
+
+<!-- E -->
+<section class="opt" id="e">
+  <div class="wrap reveal-demo">
+    <span class="opt__tag">Option E</span>
+    <h2 class="opt__title">Word-by-word heading reveal</h2>
+    <p class="opt__desc">Section headings assemble a word at a time as they enter the screen.</p>
+    <h2 id="rv" data-text="Compliance and care, under one canopy."></h2>
+    <button class="replay" data-replay="rv">↻ Replay</button>
+  </div>
+</section>
+
+<section class="opt" style="border:none;">
+  <div class="wrap">
+    <p class="opt__desc" style="opacity:0.6;">Tip: open this same page on your phone at the WiFi URL + <b>/preview.html</b> to feel the motion on mobile too.</p>
+  </div>
+</section>
+
+<script>
+  /* A — build a seamless marquee (content duplicated so -50% loops cleanly) */
+  (function () {
+    var items = ['Labour Law Advisory', 'POSH Compliance', 'HR & Organisation Development', 'Training & Capability Building', 'Employee Wellbeing'];
+    var one = items.map(function (t) { return '<span>' + t + '</span>'; }).join('');
+    document.getElementById('mq').innerHTML = one + one; // two copies
+  })();
+
+  /* B — count-up on view + replay */
+  (function () {
+    function run(root) {
+      root.querySelectorAll('[data-count]').forEach(function (el) {
+        var raw = el.getAttribute('data-count');
+        var target = parseInt(raw, 10) || 0;
+        var suffix = raw.replace(/[0-9]/g, '');
+        var start = null, dur = 1400;
+        function step(ts) {
+          if (start === null) start = ts;
+          var p = Math.min(1, (ts - start) / dur);
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * eased) + suffix;
+          if (p < 1) requestAnimationFrame(step);
+        }
+        el.textContent = '0' + suffix;
+        requestAnimationFrame(step);
+      });
+    }
+    var stats = document.getElementById('stats');
+    var io = new IntersectionObserver(function (e) {
+      e.forEach(function (x) { if (x.isIntersecting) { run(stats); io.unobserve(stats); } });
+    }, { threshold: 0.4 });
+    io.observe(stats);
+    document.querySelector('[data-replay="stats"]').addEventListener('click', function () { run(stats); });
+  })();
+
+  /* C — rotating word */
+  (function () {
+    var words = ['held.', 'untangled.', 'resolved.', 'handled.'];
+    var el = document.getElementById('rot'), i = 0;
+    setInterval(function () {
+      el.classList.add('is-out');
+      setTimeout(function () {
+        i = (i + 1) % words.length;
+        el.textContent = words[i];
+        el.classList.remove('is-out'); el.classList.add('is-in');
+        requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.remove('is-in'); }); });
+      }, 320);
+    }, 2200);
+  })();
+
+  /* D — parallax */
+  (function () {
+    var win = document.getElementById('px'), img = document.getElementById('pximg'), ticking = false;
+    function update() {
+      var r = win.getBoundingClientRect();
+      var progress = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight; // -1..1-ish
+      img.style.transform = 'translateY(' + (progress * -40) + 'px)';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    update();
+  })();
+
+  /* E — word-by-word reveal on view + replay */
+  (function () {
+    var h = document.getElementById('rv');
+    function build() {
+      h.innerHTML = h.getAttribute('data-text').split(' ').map(function (w) { return '<span class="rv-word">' + w + '</span>'; }).join(' ');
+    }
+    function play() {
+      build();
+      var words = h.querySelectorAll('.rv-word');
+      words.forEach(function (w, idx) { setTimeout(function () { w.classList.add('go'); }, idx * 90); });
+    }
+    build();
+    var io = new IntersectionObserver(function (e) {
+      e.forEach(function (x) { if (x.isIntersecting) { play(); io.unobserve(h); } });
+    }, { threshold: 0.6 });
+    io.observe(h);
+    document.querySelector('[data-replay="rv"]').addEventListener('click', play);
+  })();
+</script>
+</body>
+</html>

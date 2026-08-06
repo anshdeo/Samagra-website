@@ -317,7 +317,7 @@
     justify-content: center;
     text-align: center;
     color: var(--sage);
-    background-image: linear-gradient(rgba(26, 43, 27, 0.55), rgba(26, 43, 27, 0.78)), url('https://images.unsplash.com/photo-1709314879220-d1619e91bb61?w=1920&q=75&auto=format&fit=crop');
+    background-image: linear-gradient(rgba(26, 43, 27, 0.55), rgba(26, 43, 27, 0.78)), var(--img-hero, url('./source/images/backgrounds/banyan-canopy.jpg'));
     background-size: cover;
     background-position: center;
     padding: calc(var(--nav-height) + var(--space-6)) 0 var(--space-6);
@@ -384,6 +384,36 @@
     font-size: clamp(2rem, 6vw, 3.4rem);
     line-height: 1.2;
     margin: 0 0 var(--space-4);
+  }
+
+  /* Rotating last word in the hero headline (Option C) — a single word gently
+     fades up/out to the next. Everything else in the headline stays put. */
+  .hero__rot {
+    display: inline-block;
+  }
+
+  .hero__rot-word {
+    display: inline-block;
+    transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+  }
+
+  .hero__rot-word.is-out {
+    opacity: 0;
+    transform: translateY(-0.35em);
+  }
+
+  /* Word-by-word heading reveal (Option E) — each word rises + fades in with a
+     small stagger (delay set inline per word). */
+  .rv-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+
+  .rv-word.go {
+    opacity: 1;
+    transform: none;
+    transition: opacity 520ms var(--ease), transform 520ms var(--ease);
   }
 
   .hero__subtext {
@@ -486,6 +516,58 @@
     .root:hover .root__cue svg {
       transform: none !important;
     }
+
+    /* Motion add-ons off: show final states, freeze the marquee. */
+    .rv-word,
+    .hero__rot-word {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    .marquee__track {
+      animation: none !important;
+    }
+  }
+
+  /* Marquee band (Option A) — one quiet, slow ribbon of the practices between
+     How We Work and Team. Warm stone strip; faded edges; no hard stop. */
+  .marquee {
+    background: var(--stone);
+    color: var(--forest);
+    padding: var(--space-4) 0;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee 32s linear infinite;
+  }
+
+  .marquee:hover .marquee__track {
+    animation-play-state: paused;
+  }
+
+  .marquee__item {
+    font-family: var(--font-display);
+    font-weight: var(--weight-display-regular);
+    font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+    white-space: nowrap;
+    padding: 0 var(--space-5);
+    opacity: 0.82;
+  }
+
+  .marquee__item::after {
+    content: '·';
+    margin-left: var(--space-5);
+    opacity: 0.4;
+  }
+
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
   }
 
   /* Media (photo) component, shared across sections — static frame, no hover-zoom
@@ -693,7 +775,7 @@
   .identity__backdrop {
     position: absolute;
     inset: 0;
-    background-image: url('https://images.unsplash.com/photo-1709314879220-d1619e91bb61?w=1600&q=60&auto=format&fit=crop');
+    background-image: var(--img-identity-bg, url('./source/images/backgrounds/banyan-canopy.jpg'));
     background-size: cover;
     background-position: center;
     filter: blur(3px) brightness(0.65) saturate(0.9);
@@ -1143,8 +1225,8 @@
 
   .root__frame {
     position: relative;
-    width: 96px;
-    height: 96px;
+    width: 112px;
+    height: 112px;
     border-radius: 50%;
     overflow: hidden;
     background: var(--forest-deep);
@@ -1295,6 +1377,14 @@
     }
   }
 
+  /* On wider screens the columns have room, so enlarge the portraits. */
+  @media (min-width: 1200px) {
+    .root__frame {
+      width: 184px;
+      height: 184px;
+    }
+  }
+
   /* Bio dialog — a two-tone profile card: a forest-green header (the same
      dark earth as the team section, so the popup feels of a piece with it)
      carrying the portrait and name, over a light body for the longer bio
@@ -1315,56 +1405,107 @@
     background: var(--sage);
     color: var(--ink);
     overflow: hidden auto;
+    /* Keep scroll inside the popup — don't chain to the page behind it. */
+    overscroll-behavior: contain;
+  }
+
+  /* While a bio popup is open, freeze the page behind it so scrolling the
+     popup (or past its ends) never moves the page. */
+  html.dialog-open {
+    overflow: hidden;
   }
 
   .bio-dialog::backdrop {
     background: rgba(26, 43, 27, 0.66);
   }
 
+  /* Header reads like a business card: portrait on the left, name/role/socials
+     stacked beside it. Horizontal keeps it short — critical on mobile, where
+     the old centred stack forced a lot of scrolling. */
   .bio-dialog__header {
     position: sticky;
     top: 0;
-    text-align: center;
-    padding: var(--space-5) var(--space-5) var(--space-4);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    padding-right: 60px;
     background: var(--forest-deep);
     color: var(--sage);
   }
 
   .bio-dialog__portrait {
-    width: 96px;
-    height: 96px;
-    margin: 0 auto var(--space-3);
+    flex-shrink: 0;
+    width: 78px;
+    height: 78px;
     border-radius: 50%;
     overflow: hidden;
     background: rgba(248, 250, 248, 0.1);
     box-shadow: 0 0 0 1px rgba(248, 250, 248, 0.35);
   }
 
+  .bio-dialog__identity {
+    min-width: 0;
+  }
+
   .bio-dialog__name {
     font-family: var(--font-display);
     font-weight: var(--weight-display);
-    font-size: 1.5rem;
-    line-height: 1.2;
+    font-size: 1.3rem;
+    line-height: 1.15;
     color: var(--sage);
-    margin: 0 0 var(--space-1);
+    margin: 0 0 4px;
   }
 
   .bio-dialog__meta {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: var(--weight-label);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--sage);
     opacity: 0.6;
     margin: 0;
   }
 
+  /* Social links row inside a person's popup — only the ones set in
+     config.js (not "None") are rendered. */
+  .bio-dialog__socials {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+
+  .bio-dialog__social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(248, 250, 248, 0.3);
+    color: var(--sage);
+    transition: background var(--transition-fast) var(--ease), color var(--transition-fast) var(--ease), border-color var(--transition-fast) var(--ease);
+  }
+
+  .bio-dialog__social:hover {
+    background: var(--sage);
+    color: var(--forest-deep);
+    border-color: var(--sage);
+  }
+
+  .bio-dialog__social svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+  }
+
   .bio-dialog__close {
     position: absolute;
     top: var(--space-3);
     right: var(--space-3);
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1390,50 +1531,69 @@
   .bio-dialog__bio {
     font-size: 0.95rem;
     line-height: 1.65;
-    margin: 0 0 var(--space-5);
+    margin: 0 0 var(--space-4);
   }
 
   .bio-dialog__expertise-heading {
     font-family: var(--font-body);
     font-weight: var(--weight-label);
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--forest);
+    opacity: 0.75;
     margin: 0 0 var(--space-3);
   }
 
+  /* Expertise as chips that wrap to fill the width — far more compact than a
+     one-per-line list (much less scrolling on mobile) and more considered
+     than plain bullets. Any number of items just flows. */
   .bio-dialog__expertise {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .bio-dialog__expertise li {
-    position: relative;
-    padding-left: var(--space-3);
-    font-size: 0.85rem;
-    opacity: 0.85;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    padding: 6px 12px;
+    border: 1px solid var(--mist);
+    border-radius: 999px;
+    background: rgba(44, 59, 45, 0.05);
+    color: var(--forest);
   }
 
-  .bio-dialog__expertise li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.55em;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--forest);
+  @media (min-width: 600px) {
+    .bio-dialog__body {
+      padding: var(--space-5) var(--space-6) var(--space-6);
+    }
   }
 
-  @media (min-width: 440px) {
-    .bio-dialog__expertise {
-      grid-template-columns: 1fr 1fr;
-      column-gap: var(--space-4);
+  /* Tighten the header on small phones so long names/roles have room to
+     breathe next to the portrait. */
+  @media (max-width: 479px) {
+    .bio-dialog__header {
+      gap: var(--space-3);
+      padding: var(--space-4);
+      padding-right: 52px;
+    }
+    .bio-dialog__portrait {
+      width: 64px;
+      height: 64px;
+    }
+    .bio-dialog__name {
+      font-size: 1.1rem;
+    }
+    .bio-dialog__meta {
+      font-size: 0.64rem;
+      letter-spacing: 0.05em;
+    }
+    .bio-dialog__body {
+      padding: var(--space-4);
     }
   }
 
@@ -1677,6 +1837,78 @@
     margin: 0;
   }
 
+  /* Company social links (footer + contact) — only the ones set in config.js
+     (not "None") are rendered. */
+  .social-row {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  /* A bare display on .social-row / these wrappers outweighs [hidden], so
+     hide them explicitly when config has no links set. */
+  .footer__socials[hidden],
+  .contact__socials[hidden] {
+    display: none;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid;
+    transition: background var(--transition-fast) var(--ease), color var(--transition-fast) var(--ease), border-color var(--transition-fast) var(--ease);
+  }
+
+  .social-link svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  .footer__socials {
+    margin-top: var(--space-4);
+  }
+
+  .footer__socials .social-link {
+    border-color: rgba(248, 250, 248, 0.28);
+    color: var(--sage);
+  }
+
+  .footer__socials .social-link:hover {
+    background: var(--sage);
+    color: var(--forest-deep);
+    border-color: var(--sage);
+  }
+
+  .contact__socials {
+    margin-top: var(--space-5);
+  }
+
+  .contact__socials-label {
+    font-family: var(--font-body);
+    font-weight: var(--weight-label);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--forest);
+    opacity: 0.5;
+    margin: 0 0 var(--space-3);
+  }
+
+  .contact__socials .social-link {
+    border-color: var(--mist);
+    color: var(--forest);
+  }
+
+  .contact__socials .social-link:hover {
+    background: var(--forest);
+    color: var(--sage);
+    border-color: var(--forest);
+  }
+
   .footer__col-label {
     font-family: var(--font-body);
     font-weight: var(--weight-label);
@@ -1819,7 +2051,7 @@
           <p class="reveal"><em>Samagra</em> means whole. Most firms split labour law, HR, training, and wellbeing across vendors who never talk to each other. We put five specialists under one roof instead — so when one issue touches all four, the right person's already in the room.</p>
         </div>
         <div class="media-frame why-samagra__media reveal">
-          <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=75&auto=format&fit=crop" alt="Consultant gesturing during a workplace advisory meeting">
+          <img src="./source/images/sections/why-samagra-meeting.jpg" alt="Consultant gesturing during a workplace advisory meeting">
         </div>
       </div>
 
@@ -1893,7 +2125,7 @@
         <p class="reveal">A POSH case turns into a labour law question. A labour dispute reveals an HR gap. We built the firm so the right expert is already in the room when that happens — not a phone call away.</p>
       </div>
       <div class="identity__media reveal">
-        <img src="https://images.unsplash.com/photo-1709314879220-d1619e91bb61?w=900&q=75&auto=format&fit=crop" alt="Banyan tree canopy from below, green and moody">
+        <img src="./source/images/backgrounds/banyan-canopy.jpg" alt="Banyan tree canopy from below, green and moody">
       </div>
     </div>
 
@@ -1973,7 +2205,7 @@
       </div>
 
       <div class="media-frame what-we-do__media reveal">
-        <img src="https://images.unsplash.com/photo-1642522029686-5485ea7e6042?w=900&q=75&auto=format&fit=crop&crop=bottom" alt="Consultant reviewing documents at a desk">
+        <img src="./source/images/sections/what-we-do-desk.jpg" alt="Consultant reviewing documents at a desk">
       </div>
       </div>
     </div>
@@ -2023,199 +2255,20 @@
     </div>
   </section>
 
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track" id="marquee-track"></div>
+  </div>
+
   <section id="team" class="section team">
     <div class="container">
       <p class="eyebrow eyebrow--on-dark reveal">One canopy · five roots</p>
       <h2 class="team__heading reveal">Meet the team</h2>
       <p class="team__intro reveal">Each an independent expert who could stand alone — all anchored to one shared purpose. Tap anyone to read their background.</p>
 
-      <div class="team__roots">
-        <button class="root reveal" type="button" data-dialog-target="dialog-1" aria-label="Read bio — Chandra Deo, Head Consultant">
-          <span class="root__frame">
-            <img class="avatar" src="https://images.unsplash.com/photo-1742981365880-698cfb84492d?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Chandra Deo">
-          </span>
-          <span class="root__body">
-            <span class="root__name">Chandra Deo</span>
-            <span class="root__role">Head Consultant</span>
-            <span class="root__years">31 years</span>
-            <span class="root__cue">Read bio <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </span>
-        </button>
-
-        <button class="root reveal" type="button" data-dialog-target="dialog-2" aria-label="Read bio — Sonali Sarma, Leadership Development and POSH Consultant">
-          <span class="root__frame">
-            <img class="avatar" src="https://images.unsplash.com/photo-1770626899426-baed57609a30?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Sonali Sarma">
-          </span>
-          <span class="root__body">
-            <span class="root__name">Sonali Sarma</span>
-            <span class="root__role">Leadership Development &amp; POSH Consultant</span>
-            <span class="root__years">37 years</span>
-            <span class="root__cue">Read bio <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </span>
-        </button>
-
-        <button class="root reveal" type="button" data-dialog-target="dialog-3" aria-label="Read bio — Adv. Avdhesh Kumar Dubey, Advocate, Supreme Court">
-          <span class="root__frame">
-            <img class="avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Adv. Avdhesh Kumar Dubey">
-          </span>
-          <span class="root__body">
-            <span class="root__name">Adv. Avdhesh Kumar Dubey</span>
-            <span class="root__role">Advocate, Supreme Court</span>
-            <span class="root__years">15+ years</span>
-            <span class="root__cue">Read bio <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </span>
-        </button>
-
-        <button class="root reveal" type="button" data-dialog-target="dialog-4" aria-label="Read bio — Pravin Parmar, Labour Law Consultant">
-          <span class="root__frame">
-            <img class="avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Pravin Parmar">
-          </span>
-          <span class="root__body">
-            <span class="root__name">Pravin Parmar</span>
-            <span class="root__role">Labour Law Consultant</span>
-            <span class="root__years">26 years</span>
-            <span class="root__cue">Read bio <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </span>
-        </button>
-
-        <button class="root reveal" type="button" data-dialog-target="dialog-5" aria-label="Read bio — Dr. Priyadarshini Deo, Mental Health and Psychosocial Care Consultant">
-          <span class="root__frame">
-            <img class="avatar" src="https://images.unsplash.com/photo-1770627016447-cb9d29ed0398?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Dr. Priyadarshini Deo">
-          </span>
-          <span class="root__body">
-            <span class="root__name">Dr. Priyadarshini Deo</span>
-            <span class="root__role">Mental Health &amp; Psychosocial Care Consultant</span>
-            <span class="root__years">16+ years</span>
-            <span class="root__cue">Read bio <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          </span>
-        </button>
-      </div>
+      <div class="team__roots" id="team-roots"></div>
     </div>
 
-    <dialog class="bio-dialog" id="dialog-1" aria-labelledby="dialog-1-title">
-      <div class="bio-dialog__header">
-        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-        <div class="bio-dialog__portrait">
-          <img class="avatar" src="https://images.unsplash.com/photo-1742981365880-698cfb84492d?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Chandra Deo">
-        </div>
-        <h3 class="bio-dialog__name" id="dialog-1-title">Chandra Deo</h3>
-        <p class="bio-dialog__meta">Head Consultant · 31 years</p>
-      </div>
-      <div class="bio-dialog__body">
-        <p class="bio-dialog__bio">31 years across government regulatory service, corporate HR, and independent compliance consulting — 26 of them as a Central Labour Service Officer with the Ministry of Labour and Employment, retiring as Welfare &amp; Cess Commissioner. MA in Personnel Management and Industrial Relations (TISS Mumbai), LLB (Patna University) — a rare pairing of HR fluency and legal procedure.</p>
-        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
-        <ul class="bio-dialog__expertise">
-          <li>POSH Compliance &amp; ICC Constitution</li>
-          <li>Government Regulatory Liaison</li>
-          <li>ICC Chairing &amp; External Member Services</li>
-          <li>Workplace Wellbeing Strategy</li>
-          <li>Workplace Investigations</li>
-          <li>Policy Drafting</li>
-          <li>Labour Law Advisory</li>
-          <li>Senior Stakeholder Engagement</li>
-        </ul>
-      </div>
-    </dialog>
-
-    <dialog class="bio-dialog" id="dialog-2" aria-labelledby="dialog-2-title">
-      <div class="bio-dialog__header">
-        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-        <div class="bio-dialog__portrait">
-          <img class="avatar" src="https://images.unsplash.com/photo-1770626899426-baed57609a30?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Sonali Sarma">
-        </div>
-        <h3 class="bio-dialog__name" id="dialog-2-title">Sonali Sarma</h3>
-        <p class="bio-dialog__meta">Leadership Development &amp; POSH Consultant · 37 years</p>
-      </div>
-      <div class="bio-dialog__body">
-        <p class="bio-dialog__bio">37 years in HR, Learning, and Organisation Development across manufacturing, public sector, and multinational companies. Two years ago she moved into the not-for-profit sector while continuing to lead HR — and stayed just as hands-on with plant managers, supervisors, unions, and frontline teams.</p>
-        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
-        <ul class="bio-dialog__expertise">
-          <li>Leadership Development &amp; Coaching</li>
-          <li>Change Management &amp; Culture Transformation</li>
-          <li>Talent Management &amp; Succession Planning</li>
-          <li>Industrial Relations &amp; Employee Relations</li>
-          <li>POSH Awareness &amp; IC Training</li>
-          <li>Employee Engagement &amp; HR Strategy</li>
-          <li>Conflict &amp; Team Management</li>
-          <li>Competency-Based Leadership &amp; Managerial Capacity Building</li>
-        </ul>
-      </div>
-    </dialog>
-
-    <dialog class="bio-dialog" id="dialog-3" aria-labelledby="dialog-3-title">
-      <div class="bio-dialog__header">
-        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-        <div class="bio-dialog__portrait">
-          <img class="avatar" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Adv. Avdhesh Kumar Dubey">
-        </div>
-        <h3 class="bio-dialog__name" id="dialog-3-title">Adv. Avdhesh Kumar Dubey</h3>
-        <p class="bio-dialog__meta">Advocate, Supreme Court · 15+ years</p>
-      </div>
-      <div class="bio-dialog__body">
-        <p class="bio-dialog__bio">Practising advocate before the Supreme Court of India and the night courts, with 15+ years in corporate and family law. Chambers in Mumbai, Delhi, and at the Supreme Court give Samagra direct litigation capability — for POSH and labour matters that move beyond internal resolution into contested proceedings.</p>
-        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
-        <ul class="bio-dialog__expertise">
-          <li>Supreme Court Litigation</li>
-          <li>Night Court Practice</li>
-          <li>Corporate Law Advisory &amp; Disputes</li>
-          <li>Client Representation in Contested Proceedings</li>
-          <li>Family Law Matters</li>
-          <li>Legal Risk Assessment</li>
-          <li>Escalated POSH &amp; Workplace Litigation</li>
-          <li>Cross-Referral Coordination</li>
-        </ul>
-      </div>
-    </dialog>
-
-    <dialog class="bio-dialog" id="dialog-4" aria-labelledby="dialog-4-title">
-      <div class="bio-dialog__header">
-        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-        <div class="bio-dialog__portrait">
-          <img class="avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Pravin Parmar">
-        </div>
-        <h3 class="bio-dialog__name" id="dialog-4-title">Pravin Parmar</h3>
-        <p class="bio-dialog__meta">Labour Law Consultant · 26 years</p>
-      </div>
-      <div class="bio-dialog__body">
-        <p class="bio-dialog__bio">26 years with the Government of India's Central Labour Service — Assistant Labour Commissioner, Welfare Commissioner, then Labour Welfare Commissioner. Has argued service matters before the Central Administrative Tribunal and High Court, and trained PSUs including BSNL, Power Grid, and Ordnance Factory on labour law.</p>
-        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
-        <ul class="bio-dialog__expertise">
-          <li>Labour Law Implementation &amp; Compliance</li>
-          <li>Labour Welfare Administration</li>
-          <li>Industrial Relations &amp; Industrial Peace</li>
-          <li>PSU Labour Law Training</li>
-          <li>Service Matters — CAT &amp; High Court</li>
-          <li>Union–Management Relations Training</li>
-          <li>Disciplinary Proceedings &amp; Domestic Enquiries</li>
-          <li>Complex Industrial Dispute Resolution</li>
-        </ul>
-      </div>
-    </dialog>
-
-    <dialog class="bio-dialog" id="dialog-5" aria-labelledby="dialog-5-title">
-      <div class="bio-dialog__header">
-        <button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>
-        <div class="bio-dialog__portrait">
-          <img class="avatar" src="https://images.unsplash.com/photo-1770627016447-cb9d29ed0398?w=400&h=400&fit=crop&crop=faces&q=75&auto=format" alt="Dr. Priyadarshini Deo">
-        </div>
-        <h3 class="bio-dialog__name" id="dialog-5-title">Dr. Priyadarshini Deo</h3>
-        <p class="bio-dialog__meta">Mental Health &amp; Psychosocial Care Consultant · 16+ years</p>
-      </div>
-      <div class="bio-dialog__body">
-        <p class="bio-dialog__bio">Mental health and psychosocial care specialist — MA in Medical &amp; Psychiatric Social Work (TISS Mumbai), PhD in Psychology (SNDT). Senior Counsellor at Kokilaben Hospital's Centre for Cancer &amp; Palliative Care since 2009, with deep experience in grief, bereavement, and caregiver support.</p>
-        <h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>
-        <ul class="bio-dialog__expertise">
-          <li>Counselling Across Age Groups &amp; Major Mental Illnesses</li>
-          <li>Psychiatric Social Work</li>
-          <li>Grief &amp; Bereavement Counselling</li>
-          <li>PhD Guide — Psychology &amp; Social Work</li>
-          <li>Palliative &amp; End-of-Life Care Counselling</li>
-          <li>Fieldwork Supervision</li>
-          <li>Caregiver Support Counselling</li>
-          <li>International Professional Exchange</li>
-        </ul>
-      </div>
-    </dialog>
+    <div id="team-dialogs"></div>
   </section>
 
   <section id="contact" class="section contact">
@@ -2235,6 +2288,10 @@
               <span class="contact__direct-value">Borivali (West), Mumbai&nbsp;— 400092</span>
             </li>
           </ul>
+          <div class="contact__socials reveal" id="contact-socials" hidden>
+            <p class="contact__socials-label">Follow us</p>
+            <div class="social-row" id="contact-socials-row"></div>
+          </div>
         </div>
 
         <div class="contact__form-col reveal">
@@ -2294,6 +2351,7 @@
           <span class="footer__brand-name">Samagra Workplace Advisory</span>
         </a>
         <p class="footer__tagline">Compliance and care under one canopy — five practices, one integrated team.</p>
+        <div class="footer__socials social-row" id="footer-socials" hidden></div>
       </div>
 
       <div class="footer__col">
@@ -2320,6 +2378,249 @@
 </footer>
 
 <script>
+  /* Load config.js fresh every time so edits to it (and swapped-in images)
+     show on a normal refresh — no hard-reload needed. */
+  window.__CB = Date.now();
+  document.write('<script src="./config.js?v=' + window.__CB + '"><\/script>');
+</script>
+
+<script>
+  /* -----------------------------------------------------------------------
+     Config renderer — fills the page from config.js. Runs before the
+     interaction scripts below, so generated elements (team, dialogs) exist
+     when those initialise. To change content, edit config.js — not here.
+     ----------------------------------------------------------------------- */
+  (function () {
+    var C = window.SITE_CONFIG;
+    if (!C) return; // no config -> the static HTML stays as a fallback
+
+    function esc(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function text(sel, val) { var el = document.querySelector(sel); if (el && val != null) el.textContent = val; }
+    function html(sel, val) { var el = document.querySelector(sel); if (el && val != null) el.innerHTML = val; }
+    function attr(sel, name, val) { var el = document.querySelector(sel); if (el && val != null) el.setAttribute(name, val); }
+    function each(sel, arr, fn) {
+      var els = document.querySelectorAll(sel), n = Math.min(els.length, (arr || []).length);
+      for (var i = 0; i < n; i++) fn(els[i], arr[i], i);
+    }
+
+    var ctaLabel = (C.brand && C.brand.ctaLabel) || 'Get in Touch';
+
+    /* Brand + nav */
+    text('.nav__brand-text', C.brand.short);
+    text('.nav__brand-text-full', C.brand.full);
+    each('.nav__menu .nav__link', C.nav, function (el, item) { el.textContent = item.label; el.setAttribute('href', item.href); });
+    text('.nav__cta', ctaLabel);
+
+    /* Hero */
+    text('.hero__eyebrow', C.hero.eyebrow);
+    text('.hero__title', C.hero.title);
+    text('.hero__subtext', C.hero.subtext);
+    text('.hero .btn--primary', C.hero.cta || ctaLabel);
+
+    /* Why Samagra */
+    text('#why-samagra .eyebrow', C.whySamagra.eyebrow);
+    text('.why-samagra__heading', C.whySamagra.heading);
+    html('.why-samagra__text p:last-of-type', C.whySamagra.body);
+    text('.why-list__heading', C.whySamagra.listHeading);
+    each('.why-list__item', C.whySamagra.list, function (el, item) {
+      el.querySelector('.why-list__item-title').textContent = item.title;
+      el.querySelector('.why-list__item-desc').textContent = item.desc;
+    });
+
+    /* Impact */
+    each('.stats__item', C.impact, function (el, item) {
+      el.querySelector('.stats__number').textContent = item.number;
+      el.querySelector('.stats__label').textContent = item.label;
+    });
+
+    /* Identity */
+    text('#identity .eyebrow', C.identity.eyebrow);
+    text('.identity__heading', C.identity.heading);
+    each('.identity__text p:not(.eyebrow)', C.identity.paragraphs, function (el, p) { el.textContent = p; });
+
+    /* What We Do */
+    text('#what-we-do .eyebrow', C.whatWeDo.eyebrow);
+    text('.what-we-do__heading', C.whatWeDo.heading);
+    text('.what-we-do__cta', C.whatWeDo.cta || ctaLabel);
+    each('.accordion__item', C.whatWeDo.services, function (el, s) {
+      el.querySelector('.accordion__trigger span:first-child').textContent = s.title;
+      el.querySelector('.accordion__panel p').textContent = s.desc;
+    });
+
+    /* How We Work */
+    text('#how-we-work .eyebrow', C.howWeWork.eyebrow);
+    text('.how-we-work__heading', C.howWeWork.heading);
+    text('.how-we-work__intro', C.howWeWork.intro);
+    each('.how-we-work__grid .step', C.howWeWork.steps, function (el, s) {
+      el.querySelector('.step__number').textContent = s.number;
+      el.querySelector('.step__title').textContent = s.title;
+      el.querySelector('.step__desc').textContent = s.desc;
+    });
+
+    /* Team heading */
+    text('#team .eyebrow', C.team.eyebrow);
+    text('.team__heading', C.team.heading);
+    text('.team__intro', C.team.intro);
+
+    /* Contact */
+    var ct = C.contact;
+    text('#contact .eyebrow', ct.eyebrow);
+    text('.contact__heading', ct.heading);
+    text('.contact__intro', ct.intro);
+    var dLabels = document.querySelectorAll('.contact__direct-label');
+    var dValues = document.querySelectorAll('.contact__direct .contact__direct-value');
+    if (dLabels[0]) dLabels[0].textContent = ct.emailLabel;
+    if (dLabels[1]) dLabels[1].textContent = ct.officeLabel;
+    if (dValues[0]) { dValues[0].textContent = C.brand.email; dValues[0].setAttribute('href', 'mailto:' + C.brand.email); }
+    if (dValues[1]) dValues[1].textContent = ct.officeValue;
+    attr('#contact-form', 'action', ct.formAction);
+    text('label[for="contact-name"]', ct.fields.name);
+    text('label[for="contact-email"]', ct.fields.email);
+    html('label[for="contact-phone"]', esc(ct.fields.phone) + ' <span>' + esc(ct.fields.phoneOptional) + '</span>');
+    text('label[for="contact-message"]', ct.fields.message);
+    text('.form__submit', ct.submit);
+    text('#form-success', ct.success);
+    html('#form-error', esc(ct.errorBefore) + '<a href="mailto:' + esc(C.brand.email) + '">' + esc(C.brand.email) + '</a>' + esc(ct.errorAfter));
+
+    /* Footer */
+    var f = C.footer;
+    text('.footer__brand-name', C.brand.fullName);
+    text('.footer__tagline', f.tagline);
+    var colLabels = document.querySelectorAll('.footer__col-label');
+    if (colLabels[0]) colLabels[0].textContent = f.visitLabel;
+    if (colLabels[1]) colLabels[1].textContent = f.reachLabel;
+    html('.footer__col:nth-child(2) p', (f.address || []).map(esc).join('<br>'));
+    html('.footer__col:nth-child(3) p',
+      '<a class="footer__link" href="mailto:' + esc(C.brand.email) + '">' + esc(C.brand.email) + '</a><br>' +
+      '<a class="footer__link" href="#contact">' + esc(f.sendLabel) + '</a>');
+    text('.footer__services', f.services);
+    var fBottom = document.querySelectorAll('.footer__bottom span');
+    if (fBottom[0]) fBottom[0].textContent = f.copyright;
+    if (fBottom[1]) fBottom[1].textContent = f.location;
+
+    /* Images */
+    // Append a per-load token so a replaced image shows on a normal refresh.
+    function bust(url) { return url ? url + (url.indexOf('?') > -1 ? '&' : '?') + 'v=' + (window.__CB || 1) : url; }
+
+    var im = C.images || {};
+    if (im.heroBackground) document.documentElement.style.setProperty('--img-hero', "url('" + bust(im.heroBackground) + "')");
+    if (im.identityBackground) document.documentElement.style.setProperty('--img-identity-bg', "url('" + bust(im.identityBackground) + "')");
+    attr('.identity__media img', 'src', bust(im.identityPhoto));
+    attr('.why-samagra__media img', 'src', bust(im.whySamagra));
+    attr('.what-we-do__media img', 'src', bust(im.whatWeDo));
+
+    /* ---- Team (generated from config) ---- */
+    var HONORIFICS = /^(adv|advocate|dr|mr|mrs|ms|prof|shri|smt)\.?\s+/i;
+    function slug(name) {
+      return String(name).trim().replace(HONORIFICS, '')
+        .toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+    function photoFor(m) { return bust(m.photo ? m.photo : './source/images/team/' + slug(m.name) + '.jpg'); }
+
+    var SOCIAL_ICONS = {
+      linkedin: '<svg viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"/></svg>',
+      x: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-7.5 8.6L23.3 22h-6.8l-5.3-6.9L4.9 22H1.8l8-9.2L1 2h6.9l4.8 6.4zm-1.2 18h1.7L7.4 3.8H5.6z"/></svg>',
+      instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>',
+      email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
+      facebook: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 8.5V7c0-.7.3-1 1-1h1.5V3H14c-2.2 0-3.5 1.4-3.5 3.7V8.5H8v3h2.5V21H14v-9.5h2.3l.4-3z"/></svg>',
+      youtube: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 12s0-3.2-.4-4.7a2.5 2.5 0 0 0-1.7-1.7C19.4 5.2 12 5.2 12 5.2s-7.4 0-8.9.4A2.5 2.5 0 0 0 1.4 7.3C1 8.8 1 12 1 12s0 3.2.4 4.7a2.5 2.5 0 0 0 1.7 1.7c1.5.4 8.9.4 8.9.4s7.4 0 8.9-.4a2.5 2.5 0 0 0 1.7-1.7C23 15.2 23 12 23 12zM9.8 15.3V8.7l5.7 3.3z"/></svg>'
+    };
+    var SOCIAL_LABELS = { linkedin: 'LinkedIn', x: 'X', instagram: 'Instagram', email: 'Email', facebook: 'Facebook', youtube: 'YouTube' };
+    function isSet(v) { return v && String(v).trim() && String(v).trim().toLowerCase() !== 'none'; }
+    function socialsHTML(socials) {
+      if (!socials) return '';
+      var links = ['linkedin', 'x', 'instagram', 'email']
+        .filter(function (k) { return isSet(socials[k]) && SOCIAL_ICONS[k]; })
+        .map(function (k) {
+          var href = k === 'email' ? 'mailto:' + String(socials[k]).trim() : String(socials[k]).trim();
+          return '<a class="bio-dialog__social" href="' + esc(href) + '"' +
+            (k === 'email' ? '' : ' target="_blank" rel="noopener"') +
+            ' aria-label="' + SOCIAL_LABELS[k] + '">' + SOCIAL_ICONS[k] + '</a>';
+        });
+      return links.length ? '<div class="bio-dialog__socials">' + links.join('') + '</div>' : '';
+    }
+
+    /* Company social links -> rendered into the footer + contact section.
+       Returns the <a> icons only (no wrapper), or '' if none are set. */
+    function companyLinksHTML(socials) {
+      if (!socials) return '';
+      return ['linkedin', 'x', 'instagram', 'facebook', 'youtube']
+        .filter(function (k) { return isSet(socials[k]) && SOCIAL_ICONS[k]; })
+        .map(function (k) {
+          return '<a class="social-link" href="' + esc(String(socials[k]).trim()) + '" target="_blank" rel="noopener"' +
+            ' aria-label="' + SOCIAL_LABELS[k] + '">' + SOCIAL_ICONS[k] + '</a>';
+        }).join('');
+    }
+    (function () {
+      var linksHTML = companyLinksHTML(C.socials);
+      var footerBox = document.getElementById('footer-socials');
+      var contactBox = document.getElementById('contact-socials');
+      var contactRow = document.getElementById('contact-socials-row');
+      if (footerBox) {
+        if (linksHTML) { footerBox.innerHTML = linksHTML; footerBox.hidden = false; }
+        else footerBox.hidden = true;
+      }
+      if (contactBox && contactRow) {
+        if (linksHTML) { contactRow.innerHTML = linksHTML; contactBox.hidden = false; }
+        else contactBox.hidden = true;
+      }
+    })();
+
+    var CUE_ARROW = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    var roots = document.getElementById('team-roots');
+    var dialogsWrap = document.getElementById('team-dialogs');
+    if (roots && dialogsWrap && C.team && C.team.members) {
+      var rHTML = '', dHTML = '';
+      C.team.members.forEach(function (m, idx) {
+        var i = idx + 1, photo = photoFor(m);
+        var expertise = (m.expertise || []).map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('');
+        rHTML +=
+          '<button class="root reveal" type="button" data-dialog-target="dialog-' + i + '" aria-label="Read bio — ' + esc(m.name) + ', ' + esc(m.role) + '">' +
+            '<span class="root__frame"><img class="avatar" src="' + esc(photo) + '" alt="' + esc(m.name) + '"></span>' +
+            '<span class="root__body">' +
+              '<span class="root__name">' + esc(m.name) + '</span>' +
+              '<span class="root__role">' + esc(m.role) + '</span>' +
+              '<span class="root__years">' + esc(m.years) + '</span>' +
+              '<span class="root__cue">Read bio ' + CUE_ARROW + '</span>' +
+            '</span>' +
+          '</button>';
+        dHTML +=
+          '<dialog class="bio-dialog" id="dialog-' + i + '" aria-labelledby="dialog-' + i + '-title">' +
+            '<div class="bio-dialog__header">' +
+              '<button class="bio-dialog__close" type="button" aria-label="Close">&times;</button>' +
+              '<div class="bio-dialog__portrait"><img class="avatar" src="' + esc(photo) + '" alt="' + esc(m.name) + '"></div>' +
+              '<div class="bio-dialog__identity">' +
+                '<h3 class="bio-dialog__name" id="dialog-' + i + '-title">' + esc(m.name) + '</h3>' +
+                '<p class="bio-dialog__meta">' + esc(m.role) + ' · ' + esc(m.years) + '</p>' +
+                socialsHTML(m.socials) +
+              '</div>' +
+            '</div>' +
+            '<div class="bio-dialog__body">' +
+              '<p class="bio-dialog__bio">' + esc(m.bio) + '</p>' +
+              '<h4 class="bio-dialog__expertise-heading">Areas of expertise</h4>' +
+              '<ul class="bio-dialog__expertise">' + expertise + '</ul>' +
+            '</div>' +
+          '</dialog>';
+      });
+      roots.innerHTML = rHTML;
+      dialogsWrap.innerHTML = dHTML;
+    }
+
+    /* Marquee ribbon — built from the five practice names, duplicated so the
+       -50% loop is seamless. */
+    var mqTrack = document.getElementById('marquee-track');
+    if (mqTrack && C.whatWeDo && C.whatWeDo.services) {
+      var one = C.whatWeDo.services.map(function (s) {
+        return '<span class="marquee__item">' + esc(s.title) + '</span>';
+      }).join('');
+      mqTrack.innerHTML = one + one;
+    }
+  })();
+
   (function () {
     var toggle = document.getElementById('nav-toggle');
     var menu = document.getElementById('nav-menu');
@@ -2478,6 +2779,18 @@
       dialog.addEventListener('click', function (event) {
         if (event.target === dialog) dialog.close();
       });
+
+      // Lock the page behind the popup so scrolling inside it (or past its
+      // ends) doesn't scroll the page. showModal() doesn't do this on its own.
+      dialog.addEventListener('close', function () {
+        document.documentElement.classList.remove('dialog-open');
+      });
+    });
+
+    document.querySelectorAll('.root[data-dialog-target]').forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        document.documentElement.classList.add('dialog-open');
+      });
     });
   })();
 
@@ -2525,6 +2838,124 @@
         submit.textContent = label;
       });
     });
+  })();
+
+  /* ===================== Motion add-ons ===================== */
+  var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* D — Parallax on the two banyan images (hero background + identity backdrop). */
+  (function () {
+    if (REDUCE) return;
+    var hero = document.getElementById('hero');
+    var identity = document.getElementById('identity');
+    var backdrop = identity ? identity.querySelector('.identity__backdrop') : null;
+    if (!hero && !backdrop) return;
+    var vh = window.innerHeight, ticking = false;
+    window.addEventListener('resize', function () { vh = window.innerHeight; }, { passive: true });
+    function update() {
+      var y = window.scrollY;
+      if (hero && y < hero.offsetHeight) {
+        hero.style.backgroundPositionY = 'calc(50% + ' + (y * 0.28) + 'px)';
+      }
+      if (backdrop) {
+        var r = identity.getBoundingClientRect();
+        if (r.bottom > -50 && r.top < vh + 50) {
+          var offset = r.top + r.height / 2 - vh / 2;
+          backdrop.style.transform = 'scale(1.16) translateY(' + (offset * -0.06) + 'px)';
+        }
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  })();
+
+  /* B — Count-up on the impact numbers when they scroll into view. */
+  (function () {
+    var stats = document.getElementById('impact');
+    if (!stats) return;
+    var nums = stats.querySelectorAll('.stats__number');
+    if (!nums.length) return;
+    var items = [];
+    nums.forEach(function (el) {
+      var raw = el.textContent.trim();
+      var suffix = raw.replace(/[0-9]/g, '');
+      items.push({ el: el, target: parseInt(raw, 10) || 0, suffix: suffix, raw: raw });
+    });
+    if (REDUCE) return; // leave the real numbers in place
+    items.forEach(function (t) { t.el.textContent = '0' + t.suffix; });
+    function run() {
+      items.forEach(function (t) {
+        var start = null, dur = 1400;
+        (function step(ts) {
+          if (start === null) start = ts;
+          var p = Math.min(1, (ts - start) / dur);
+          var e = 1 - Math.pow(1 - p, 3);
+          t.el.textContent = (p < 1 ? Math.round(t.target * e) + t.suffix : t.raw);
+          if (p < 1) requestAnimationFrame(step);
+        })(performance.now());
+      });
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (x) { if (x.isIntersecting) { run(); io.disconnect(); } });
+    }, { threshold: 0.4 });
+    io.observe(stats);
+  })();
+
+  /* C — Rotating last word of the hero headline. */
+  (function () {
+    var C = window.SITE_CONFIG;
+    var words = C && C.hero && C.hero.rotateWords;
+    var titleEl = document.querySelector('.hero__title');
+    if (REDUCE || !titleEl || !words || words.length < 2) return;
+    var full = titleEl.textContent.trim().split(' ');
+    var head = full.slice(0, -1).join(' ');
+    var rot = document.createElement('span'); rot.className = 'hero__rot';
+    var word = document.createElement('span'); word.className = 'hero__rot-word'; word.textContent = words[0];
+    rot.appendChild(word);
+    titleEl.textContent = head + ' ';
+    titleEl.appendChild(rot);
+    var i = 0;
+    setInterval(function () {
+      word.classList.add('is-out');
+      setTimeout(function () {
+        i = (i + 1) % words.length;
+        word.textContent = words[i];
+        word.classList.remove('is-out');
+      }, 300);
+    }, 2800);
+  })();
+
+  /* E — Word-by-word reveal on section headings (takes over their fade). */
+  (function () {
+    var heads = document.querySelectorAll('.why-samagra__heading, .identity__heading, .what-we-do__heading, .how-we-work__heading, .team__heading, .contact__heading');
+    if (!heads.length) return;
+    heads.forEach(function (h) {
+      h.classList.remove('reveal');
+      if (REDUCE) return;
+      var words = h.textContent.trim().split(' ');
+      h.textContent = '';
+      words.forEach(function (w, idx) {
+        var s = document.createElement('span');
+        s.className = 'rv-word';
+        s.style.transitionDelay = (idx * 65) + 'ms';
+        s.textContent = w;
+        h.appendChild(s);
+        if (idx < words.length - 1) h.appendChild(document.createTextNode(' '));
+      });
+    });
+    if (REDUCE) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.rv-word').forEach(function (w) { w.classList.add('go'); });
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.35 });
+    heads.forEach(function (h) { io.observe(h); });
   })();
 </script>
 
