@@ -2378,10 +2378,16 @@
 </footer>
 
 <script>
-  /* Load config.js fresh every time so edits to it (and swapped-in images)
-     show on a normal refresh — no hard-reload needed. */
+  /* During LOCAL editing (your Python preview server) we bust the cache so
+     config edits and swapped-in images show on a normal refresh. On the real
+     deployed domain we use clean URLs and let the host's cache headers handle
+     freshness (see the _headers file) — so repeat visitors aren't re-downloading
+     everything. */
   window.__CB = Date.now();
-  document.write('<script src="./config.js?v=' + window.__CB + '"><\/script>');
+  window.__LOCAL = (location.protocol === 'file:') ||
+    /^(localhost|127\.0\.0\.1|0\.0\.0\.0|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname) ||
+    /\.local$/.test(location.hostname);
+  document.write('<script src="./config.js' + (window.__LOCAL ? '?v=' + window.__CB : '') + '"><\/script>');
 </script>
 
 <script>
@@ -2503,7 +2509,8 @@
 
     /* Images */
     // Append a per-load token so a replaced image shows on a normal refresh.
-    function bust(url) { return url ? url + (url.indexOf('?') > -1 ? '&' : '?') + 'v=' + (window.__CB || 1) : url; }
+    // Only cache-bust while editing locally (see the loader note above).
+    function bust(url) { return (url && window.__LOCAL) ? url + (url.indexOf('?') > -1 ? '&' : '?') + 'v=' + (window.__CB || 1) : url; }
 
     var im = C.images || {};
     if (im.heroBackground) document.documentElement.style.setProperty('--img-hero', "url('" + bust(im.heroBackground) + "')");
