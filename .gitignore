@@ -1,2 +1,12 @@
 .playwright-mcp/
 .DS_Store
+
+# Local tooling & internal files — kept on your machine, never published
+.claude/
+docs/
+deploy.py
+preview.html
+References/
+Samagra Workplace Advisory logo/
+Samagra_Workplace_Advisory_Company_Profile-2.docx
+_headers
