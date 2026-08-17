@@ -51,13 +51,21 @@ delivered.
 
 ---
 
-## Step 4 — Connect your domain (samagraworkplace.com)
+## Step 4 — Connect your domain (samagraworkplace.in)
 
 Do this once the domain is off GoDaddy's KYC/verification hold.
 
-1. In **Settings → Pages → Custom domain**, type `samagraworkplace.com` →
-   **Save**. (GitHub adds a `CNAME` file to the repo.)
-2. In **GoDaddy → your domain → DNS**, add these records:
+> **Ignore GoDaddy's "Let's connect / select a destination" wizard** (the one
+> listing TikTok, website builders, etc.). GitHub Pages isn't in that list.
+> Close it and use **Manage DNS** to add the records below by hand.
+
+1. In **GoDaddy → My Products → samagraworkplace.in → DNS (Manage DNS)**, add
+   the records below. If a default `@` A record or `www` CNAME already exists
+   (GoDaddy parking), **edit/replace** them rather than adding duplicates.
+2. In **GitHub → Settings → Pages → Custom domain**, type `samagraworkplace.in`
+   → **Save**. (GitHub adds a `CNAME` file to the repo.)
+
+DNS records to add at GoDaddy:
 
    **Four A records** (host `@` — the bare domain):
    ```
