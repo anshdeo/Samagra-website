@@ -272,9 +272,9 @@ window.SITE_CONFIG = {
     tagline: "Compliance and care under one canopy — five practices, one integrated team.",
     visitLabel: "Visit",
     address: [
-      "201, Sun Plaza, Lokmanya Tilak Road,",
-      "Opp. Diamond Talkies, Mhatre Wadi,",
-      "Borivali (West), Mumbai — 400092"
+      "1-C 603, Surbhi Complex,",
+      "MG Cross Road Number 1,",
+      "Kandivali (West), Mumbai — 400067"
     ],
     reachLabel: "Reach us",
     sendLabel: "Send a message",
